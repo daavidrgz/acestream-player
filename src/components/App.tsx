@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio } from 'lucide-react';
+import { Radio, X } from 'lucide-react';
 
 const ACESTREAM_RE = /^[a-fA-F0-9]{40}$/;
 const BASE_URL = 'https://acestream.hermo.dev/ace/getstream?id=';
+
+const PLAYERS = [
+  { name: 'VLC', scheme: (url: string) => `vlc://${url}` },
+  { name: 'mpv', scheme: (url: string) => `mpv://${url}` },
+  { name: 'Infuse', scheme: (url: string) => `infuse://x-callback-url/play?url=${encodeURIComponent(url)}` },
+  { name: 'MX Player', scheme: (url: string) => `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/mp2t;end` },
+  { name: 'nPlayer', scheme: (url: string) => `nplayer-${url}` },
+] as const;
 
 function extractId(raw: string): string {
   const trimmed = raw.trim();
@@ -32,11 +40,11 @@ export default function App() {
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showPlayers, setShowPlayers] = useState(false);
 
   const id = extractId(input);
   const isValid = ACESTREAM_RE.test(id);
   const streamUrl = isValid ? `${BASE_URL}${id}` : '';
-  const vlcUrl = isValid ? `vlc://${streamUrl}` : '';
 
   function handlePlay() {
     if (!input.trim()) {
@@ -48,7 +56,12 @@ export default function App() {
       return;
     }
     setError('');
-    window.location.href = vlcUrl;
+    setShowPlayers(true);
+  }
+
+  function openIn(player: (typeof PLAYERS)[number]) {
+    window.location.href = player.scheme(streamUrl);
+    setShowPlayers(false);
   }
 
   return (
@@ -64,7 +77,7 @@ export default function App() {
           AceStream Player
         </h1>
         <p className="mb-10 text-center text-sm text-gray-400">
-          Paste an ID to open the stream in VLC
+          Paste an ID to open the stream in your player
         </p>
 
         <Frame>
@@ -102,7 +115,7 @@ export default function App() {
                 animate={{ opacity: 1 }}
                 className="mt-3 truncate rounded-lg bg-white/60 px-3 py-2 font-mono text-xs text-gray-400 border border-gray-100"
               >
-                {vlcUrl}
+                {streamUrl}
               </motion.p>
             )}
 
@@ -114,7 +127,7 @@ export default function App() {
                 disabled={!input.trim()}
                 className="flex-1 rounded-xl bg-gray-900 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-30"
               >
-                Play in VLC
+                Open in Player
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -147,6 +160,56 @@ export default function App() {
       <p className="absolute bottom-4 text-xs text-gray-900/30">
         &copy; {new Date().getFullYear()} AceStream Player
       </p>
+
+      <AnimatePresence>
+        {showPlayers && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowPlayers(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-80 rounded-2xl bg-white p-6 shadow-xl border border-gray-100"
+            >
+              <button
+                onClick={() => setShowPlayers(false)}
+                className="absolute right-4 top-4 text-gray-300 transition hover:text-gray-500"
+              >
+                <X className="size-5" />
+              </button>
+
+              <h2 className="mb-1 text-lg font-semibold text-gray-900">
+                Choose a player
+              </h2>
+              <p className="mb-5 text-sm text-gray-400">
+                Select an app to open the stream
+              </p>
+
+              <div className="flex flex-col gap-2">
+                {PLAYERS.map((player) => (
+                  <motion.button
+                    key={player.name}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => openIn(player)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                  >
+                    {player.name}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
