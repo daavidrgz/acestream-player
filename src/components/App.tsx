@@ -1,23 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, X } from 'lucide-react';
+import { Radio, X, Tv, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ACESTREAM_RE = /^[a-fA-F0-9]{40}$/;
 const BASE_URL = 'https://acestream.hermo.dev/ace/getstream?id=';
 
 const PLAYERS = [
-  { name: 'VLC', scheme: (url: string) => `vlc://${url}` },
-  { name: 'mpv', scheme: (url: string) => `mpv://${url}` },
-  { name: 'Infuse', scheme: (url: string) => `infuse://x-callback-url/play?url=${encodeURIComponent(url)}` },
-  { name: 'MX Player', scheme: (url: string) => `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/mp2t;end` },
-  { name: 'nPlayer', scheme: (url: string) => `nplayer-${url}` },
+  { name: 'VLC', icon: '/icons/vlc.svg', scheme: (url: string) => `vlc://${url}` },
+  { name: 'mpv', icon: '/icons/mpv.svg', scheme: (url: string) => `mpv://${url}` },
+  { name: 'Infuse', icon: '/icons/infuse.png', scheme: (url: string) => `infuse://x-callback-url/play?url=${encodeURIComponent(url)}` },
+  { name: 'MX Player', icon: '/icons/mxplayer.svg', scheme: (url: string) => `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/mp2t;end` },
+  { name: 'nPlayer', icon: '/icons/nplayer.png', scheme: (url: string) => `nplayer-${url}` },
 ] as const;
 
-function extractId(raw: string): string {
-  const trimmed = raw.trim();
-  return trimmed.startsWith('acestream://')
-    ? trimmed.slice('acestream://'.length)
-    : trimmed;
+interface Stream {
+  name: string;
+  id: string;
+  availability: number | null;
+}
+
+interface Channel {
+  name: string;
+  streams: Stream[];
+}
+
+interface Team {
+  name: string;
+  badge: string;
+}
+
+interface Event {
+  time: string;
+  competition: string;
+  homeTeam: Team;
+  awayTeam: Team;
+  channels: Channel[];
+}
+
+interface Agenda {
+  generatedAt: string;
+  date: string;
+  events: Event[];
 }
 
 function Frame({ children }: { children: React.ReactNode }) {
@@ -36,140 +58,236 @@ function Frame({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
-  const [input, setInput] = useState('');
-  const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [showPlayers, setShowPlayers] = useState(false);
+function TeamBadge({ team, reverse }: { team: Team; reverse?: boolean }) {
+  return (
+    <div className={`flex items-center gap-2 min-w-0 ${reverse ? 'flex-row-reverse text-right' : ''}`}>
+      {team.badge ? (
+        <img
+          src={team.badge}
+          alt={team.name}
+          className="size-7 shrink-0 object-contain"
+          loading="lazy"
+        />
+      ) : (
+        <div className="size-7 shrink-0 rounded-full bg-gray-200" />
+      )}
+      <span className="truncate text-sm font-medium text-gray-800">{team.name}</span>
+    </div>
+  );
+}
 
-  const id = extractId(input);
-  const isValid = ACESTREAM_RE.test(id);
-  const streamUrl = isValid ? `${BASE_URL}${id}` : '';
+function StreamPicker({ streams, onSelect }: { streams: Stream[]; onSelect: (stream: Stream) => void }) {
+  const [open, setOpen] = useState(false);
 
-  function handlePlay() {
-    if (!input.trim()) {
-      setError('Please enter an AceStream ID');
-      return;
-    }
-    if (!isValid) {
-      setError('Invalid ID — must be a 40-character hex string');
-      return;
-    }
-    setError('');
-    setShowPlayers(true);
-  }
-
-  function openIn(player: (typeof PLAYERS)[number]) {
-    window.location.href = player.scheme(streamUrl);
-    setShowPlayers(false);
+  if (streams.length === 1) {
+    return (
+      <button
+        onClick={() => onSelect(streams[0])}
+        className="text-xs text-accent hover:text-accent-hover underline underline-offset-2 transition"
+      >
+        Play
+      </button>
+    );
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-0.5 text-xs text-accent hover:text-accent-hover underline underline-offset-2 transition"
+      >
+        {streams.length} streams
+        {open ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.1 }}
+            className="absolute right-0 top-6 z-30 min-w-56 rounded-lg border border-gray-200 bg-white p-1.5 shadow-lg"
+          >
+            {streams.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => { onSelect(s); setOpen(false); }}
+                className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 transition"
+              >
+                <span className="truncate flex-1">{s.name}</span>
+                {s.availability != null && (
+                  <span className={`shrink-0 text-[10px] font-medium ${s.availability >= 0.8 ? 'text-green-600' : s.availability >= 0.4 ? 'text-yellow-600' : 'text-red-500'}`}>
+                    {Math.round(s.availability * 100)}%
+                  </span>
+                )}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ChannelPill({ channel, onPlay }: { channel: Channel; onPlay: (stream: Stream) => void }) {
+  const hasStreams = channel.streams.length > 0;
+
+  return (
+    <div className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs ${
+      hasStreams
+        ? 'border-accent/20 bg-accent/5 text-gray-700'
+        : 'border-gray-200 bg-gray-50 text-gray-400'
+    }`}>
+      <Tv className="size-3 shrink-0" />
+      <span className="truncate">{channel.name}</span>
+      {hasStreams && <StreamPicker streams={channel.streams} onSelect={onPlay} />}
+    </div>
+  );
+}
+
+function EventCard({ event, onPlay }: { event: Event; onPlay: (stream: Stream) => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+    >
+      <div className="mb-3 flex items-center gap-2 text-xs text-gray-400">
+        <Clock className="size-3" />
+        <span className="font-medium">{event.time}</span>
+        <span className="mx-1">·</span>
+        <span className="truncate">{event.competition}</span>
+      </div>
+
+      <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <TeamBadge team={event.homeTeam} reverse />
+        <span className="text-xs font-bold text-gray-300">VS</span>
+        <TeamBadge team={event.awayTeam} />
+      </div>
+
+      {event.channels.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {event.channels.map((ch) => (
+            <ChannelPill key={ch.name} channel={ch} onPlay={onPlay} />
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+export default function App() {
+  const [agenda, setAgenda] = useState<Agenda | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
+
+  useEffect(() => {
+    fetch('/data/agenda.json')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load agenda');
+        return res.json();
+      })
+      .then((data: Agenda) => {
+        setAgenda(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Could not load today\'s agenda');
+        setLoading(false);
+      });
+  }, []);
+
+  function openIn(player: (typeof PLAYERS)[number]) {
+    if (!selectedStream) return;
+    const streamUrl = `${BASE_URL}${selectedStream.id}`;
+    window.location.href = player.scheme(streamUrl);
+    setSelectedStream(null);
+  }
+
+  // Group events by time
+  const grouped = agenda?.events.reduce<Record<string, Event[]>>((acc, ev) => {
+    (acc[ev.time] ??= []).push(ev);
+    return acc;
+  }, {}) ?? {};
+
+  const timeSlots = Object.keys(grouped).sort();
+
+  return (
+    <div className="min-h-dvh pb-12">
+      <motion.header
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="flex flex-col items-center"
+        className="sticky top-0 z-40 border-b border-gray-200 bg-[#f8f8f8]/80 backdrop-blur-md"
       >
-        <h1 className="mb-2 flex items-center justify-center gap-2.5 text-3xl font-bold tracking-tight text-gray-900">
-          <Radio className="size-7" />
-          AceStream Player
-        </h1>
-        <p className="mb-10 text-center text-sm text-gray-400">
-          Paste an ID to open the stream in your player
-        </p>
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
+          <h1 className="flex items-center gap-2 text-xl font-bold tracking-tight text-gray-900">
+            <Radio className="size-5" />
+            AceStream Player
+          </h1>
+          {agenda && (
+            <span className="text-xs text-gray-400">
+              {new Date(agenda.date + 'T00:00:00').toLocaleDateString('en-GB', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+            </span>
+          )}
+        </div>
+      </motion.header>
 
-        <Frame>
-          <div className="w-[560px] max-w-[calc(100vw-2rem)] px-6 py-6 sm:px-16 sm:py-10">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                setError('');
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && handlePlay()}
-              placeholder="Enter AceStream ID..."
-              spellCheck={false}
-              autoComplete="off"
-              className="w-full rounded-xl bg-white px-4 py-3.5 font-mono text-sm text-gray-900 placeholder-gray-300 outline-none border border-gray-200 shadow-sm transition focus:border-accent focus:ring-2 focus:ring-accent/20"
-            />
-
-            <AnimatePresence>
-              {error && (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-2 text-sm text-error"
-                >
-                  {error}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            {isValid && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mt-3 truncate rounded-lg bg-white/60 px-3 py-2 font-mono text-xs text-gray-400 border border-gray-100"
-              >
-                {streamUrl}
-              </motion.p>
-            )}
-
-            <div className="mt-4 flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handlePlay}
-                disabled={!input.trim()}
-                className="flex-1 rounded-xl bg-gray-900 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Open in Player
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  if (!streamUrl) return;
-                  navigator.clipboard.writeText(streamUrl);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                disabled={!isValid}
-                className="rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-base font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                {copied ? 'Copied!' : 'Copy URL'}
-              </motion.button>
-            </div>
+      <main className="mx-auto max-w-2xl px-4 pt-6">
+        {loading && (
+          <div className="flex items-center justify-center py-20 text-gray-400">
+            <div className="size-5 animate-spin rounded-full border-2 border-gray-300 border-t-accent" />
           </div>
-        </Frame>
+        )}
 
-        <a
-          href="https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 text-sm text-gray-400 underline underline-offset-2 transition hover:text-gray-600"
-        >
-          Find AceStream IDs here
-        </a>
-      </motion.div>
+        {error && (
+          <div className="py-20 text-center text-sm text-gray-400">{error}</div>
+        )}
 
-      <p className="absolute bottom-4 text-xs text-gray-900/30">
+        {!loading && !error && agenda && agenda.events.length === 0 && (
+          <div className="py-20 text-center text-sm text-gray-400">
+            No events scheduled for today
+          </div>
+        )}
+
+        {!loading && !error && timeSlots.length > 0 && (
+          <Frame>
+            <div className="px-2 py-4 sm:px-6">
+              <div className="flex flex-col gap-3">
+                {timeSlots.map((time) => (
+                  <div key={time}>
+                    {grouped[time].map((event, i) => (
+                      <div key={`${event.homeTeam.name}-${event.awayTeam.name}-${i}`} className="mb-3">
+                        <EventCard event={event} onPlay={setSelectedStream} />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Frame>
+        )}
+      </main>
+
+      <p className="mt-8 text-center text-xs text-gray-900/30">
         &copy; {new Date().getFullYear()} AceStream Player
       </p>
 
+      {/* Player selection modal */}
       <AnimatePresence>
-        {showPlayers && (
+        {selectedStream && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setShowPlayers(false)}
+            onClick={() => setSelectedStream(null)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 8 }}
@@ -180,7 +298,7 @@ export default function App() {
               className="relative w-80 rounded-2xl bg-white p-6 shadow-xl border border-gray-100"
             >
               <button
-                onClick={() => setShowPlayers(false)}
+                onClick={() => setSelectedStream(null)}
                 className="absolute right-4 top-4 text-gray-300 transition hover:text-gray-500"
               >
                 <X className="size-5" />
@@ -189,8 +307,11 @@ export default function App() {
               <h2 className="mb-1 text-lg font-semibold text-gray-900">
                 Choose a player
               </h2>
-              <p className="mb-5 text-sm text-gray-400">
+              <p className="mb-1 text-sm text-gray-400">
                 Select an app to open the stream
+              </p>
+              <p className="mb-5 truncate text-xs text-gray-300 font-mono">
+                {selectedStream.name}
               </p>
 
               <div className="flex flex-col gap-2">
@@ -200,8 +321,9 @@ export default function App() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => openIn(player)}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                    className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
                   >
+                    <img src={player.icon} alt="" className="size-5 shrink-0" />
                     {player.name}
                   </motion.button>
                 ))}

@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# generated agenda data
+public/data/agenda.json
+
 # macOS-specific files
 .DS_Store
 
