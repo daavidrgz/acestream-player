@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Radio } from 'lucide-react';
 
 const ACESTREAM_RE = /^[a-fA-F0-9]{40}$/;
-const BASE_URL = 'https://acestream.hermo.dev/ace/manifest.m3u8?id=';
+const BASE_URL = 'https://acestream.hermo.dev/play/';
 
 function extractId(raw: string): string {
   const trimmed = raw.trim();
