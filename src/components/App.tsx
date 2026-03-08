@@ -1,51 +1,31 @@
-import { useState, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
+import { Radio } from 'lucide-react';
 
 const ACESTREAM_RE = /^[a-fA-F0-9]{40}$/;
 const BASE_URL = 'https://acestream.hermo.dev/play/';
-
-function GeoSphere() {
-  const ref = useRef<THREE.Mesh>(null!);
-  useFrame((_, delta) => {
-    ref.current.rotation.y += delta * 0.15;
-    ref.current.rotation.x += delta * 0.08;
-  });
-  return (
-    <mesh ref={ref} scale={3}>
-      <icosahedronGeometry args={[1, 1]} />
-      <meshStandardMaterial
-        color="#f7901e"
-        wireframe
-        transparent
-        opacity={0.25}
-      />
-    </mesh>
-  );
-}
-
-function Scene() {
-  return (
-    <Canvas
-      className="!fixed inset-0 z-0"
-      style={{ pointerEvents: 'none' }}
-      dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 5], fov: 50 }}
-      gl={{ antialias: false }}
-    >
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={1} />
-      <GeoSphere />
-    </Canvas>
-  );
-}
 
 function extractId(raw: string): string {
   const trimmed = raw.trim();
   return trimmed.startsWith('acestream://')
     ? trimmed.slice('acestream://'.length)
     : trimmed;
+}
+
+function Frame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="frame">
+      <div className="frame-line frame-line--top" />
+      <div className="frame-line frame-line--bottom" />
+      <div className="frame-line frame-line--left" />
+      <div className="frame-line frame-line--right" />
+      <span className="frame-corner frame-corner--tl" />
+      <span className="frame-corner frame-corner--tr" />
+      <span className="frame-corner frame-corner--bl" />
+      <span className="frame-corner frame-corner--br" />
+      {children}
+    </div>
+  );
 }
 
 export default function App() {
@@ -72,94 +52,101 @@ export default function App() {
   }
 
   return (
-    <>
-      <Scene />
-      <div className="fixed inset-0 z-10 flex flex-col items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="w-full max-w-md rounded-2xl bg-surface/80 p-6 backdrop-blur-xl border border-white/5 shadow-2xl"
-        >
-          <h1 className="mb-1 text-center text-2xl font-bold tracking-tight text-white">
-            AceStream Player
-          </h1>
-          <p className="mb-6 text-center text-sm text-white/40">
-            Paste an ID to open the stream in VLC
-          </p>
+    <div className="fixed inset-0 flex flex-col items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="flex flex-col items-center"
+      >
+        <h1 className="mb-2 flex items-center justify-center gap-2.5 text-3xl font-bold tracking-tight text-gray-900">
+          <Radio className="size-7" />
+          AceStream Player
+        </h1>
+        <p className="mb-10 text-center text-sm text-gray-400">
+          Paste an ID to open the stream in VLC
+        </p>
 
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              setError('');
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && handlePlay()}
-            placeholder="Enter AceStream ID..."
-            spellCheck={false}
-            autoComplete="off"
-            className="w-full rounded-xl bg-surface-light/80 px-4 py-3.5 font-mono text-sm text-white placeholder-white/25 outline-none ring-1 ring-white/10 transition focus:ring-accent/60"
-          />
+        <Frame>
+          <div className="w-[560px] max-w-[calc(100vw-2rem)] px-6 py-6 sm:px-16 sm:py-10">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setError('');
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handlePlay()}
+              placeholder="Enter AceStream ID..."
+              spellCheck={false}
+              autoComplete="off"
+              className="w-full rounded-xl bg-white px-4 py-3.5 font-mono text-sm text-gray-900 placeholder-gray-300 outline-none border border-gray-200 shadow-sm transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+            />
 
-          <AnimatePresence>
-            {error && (
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 text-sm text-error"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {isValid && (
               <motion.p
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 text-sm text-error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-3 truncate rounded-lg bg-white/60 px-3 py-2 font-mono text-xs text-gray-400 border border-gray-100"
               >
-                {error}
+                {vlcUrl}
               </motion.p>
             )}
-          </AnimatePresence>
 
-          {isValid && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-3 truncate rounded-lg bg-black/30 px-3 py-2 font-mono text-xs text-white/30"
-            >
-              {vlcUrl}
-            </motion.p>
-          )}
-
-          <div className="mt-4 flex gap-2">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handlePlay}
-              disabled={!input.trim()}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-accent py-3.5 text-base font-semibold text-black transition-all duration-200 hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              Play in VLC
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => {
-                if (!streamUrl) return;
-                navigator.clipboard.writeText(streamUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              disabled={!isValid}
-              className="rounded-xl bg-white/10 px-4 py-3.5 text-base font-semibold text-white transition-all duration-200 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </motion.button>
+            <div className="mt-4 flex gap-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handlePlay}
+                disabled={!input.trim()}
+                className="flex-1 rounded-xl bg-gray-900 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                Play in VLC
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  if (!streamUrl) return;
+                  navigator.clipboard.writeText(streamUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                disabled={!isValid}
+                className="rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-base font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                {copied ? 'Copied!' : 'Copy URL'}
+              </motion.button>
+            </div>
           </div>
-        </motion.div>
+        </Frame>
+
         <a
           href="https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 text-sm text-accent/60 underline underline-offset-2 transition hover:text-accent"
+          className="mt-8 text-sm text-gray-400 underline underline-offset-2 transition hover:text-gray-600"
         >
           Find AceStream IDs here
         </a>
-      </div>
-    </>
+      </motion.div>
+
+      <p className="absolute bottom-4 text-xs text-gray-900/30">
+        &copy; {new Date().getFullYear()} AceStream Player
+      </p>
+    </div>
   );
 }
