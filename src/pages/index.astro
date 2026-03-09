@@ -6,7 +6,7 @@ import '../styles/global.css';
 
 function loadJson(filename: string): unknown {
 	try {
-		const filePath = resolve('public/data', filename);
+		const filePath = resolve('data', filename);
 		return JSON.parse(readFileSync(filePath, 'utf-8'));
 	} catch {
 		return null;

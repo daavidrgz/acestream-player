@@ -8,7 +8,7 @@ import { Channel, Competition, agendaSchema, type Stream } from '../../src/lib/c
 import type { AcestreamEntry, RawEvent, EspnEntry } from './types';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT_PATH = resolve(__dirname, '../../public/data/agenda.json');
+const OUT_PATH = resolve(__dirname, '../../data/agenda.json');
 const CHANNELS_PATH = resolve(__dirname, '../../data/acestream-channels.json');
 
 // Maps scraped broadcast channel names (from futbolenlatv) → canonical channel name.
