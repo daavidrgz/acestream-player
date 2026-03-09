@@ -1,23 +1,22 @@
 import { useState, useEffect, useMemo } from 'react';
-import { agendaSchema, type ChannelEntry, type Stream, type Event, type Agenda } from '@/lib/channels';
+import { agendaSchema, type Agenda, type ChannelEntry, type Stream, type Event } from '@/lib/channels';
 import { CompetitionSection } from '@/components/CompetitionSection';
 import { Header, type Day } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { StreamDialog } from '@/components/StreamDialog';
 import { PlayerDialog } from '@/components/PlayerDialog';
 
-const AGENDA_URLS: Record<Day, string> = {
-  today: '/data/agenda.json',
-  tomorrow: '/data/agenda-tomorrow.json',
-};
+const IS_SERVER = typeof window === 'undefined';
 
 function getDayFromUrl(): Day {
+  if (IS_SERVER) return 'today';
   const params = new URLSearchParams(window.location.search);
   const d = params.get('day');
   return d === 'tomorrow' ? 'tomorrow' : 'today';
 }
 
 function setDayInUrl(day: Day) {
+  if (IS_SERVER) return;
   const url = new URL(window.location.href);
   if (day === 'today') {
     url.searchParams.delete('day');
@@ -27,37 +26,31 @@ function setDayInUrl(day: Day) {
   window.history.replaceState(null, '', url);
 }
 
-export default function App() {
+function parseAgenda(raw: unknown): Agenda | null {
+  const result = agendaSchema.safeParse(raw);
+  return result.success ? result.data : null;
+}
+
+interface Props {
+  today: unknown;
+  tomorrow: unknown;
+}
+
+export default function App({ today, tomorrow }: Props) {
+  const agendas: Record<Day, Agenda | null> = useMemo(
+    () => ({ today: parseAgenda(today), tomorrow: parseAgenda(tomorrow) }),
+    [today, tomorrow],
+  );
+
   const [day, setDay] = useState<Day>(getDayFromUrl);
-  const [agenda, setAgenda] = useState<Agenda | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  // Modal state: channel selection → stream selection → player selection
   const [selectedChannel, setSelectedChannel] = useState<ChannelEntry | null>(null);
   const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
 
-  useEffect(() => {
-    setDayInUrl(day);
-  }, [day]);
+  const agenda = agendas[day];
 
   useEffect(() => {
-    setLoading(true);
-    setError('');
-    setAgenda(null);
-    fetch(AGENDA_URLS[day])
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load agenda');
-        return res.json();
-      })
-      .then((data: unknown) => {
-        setAgenda(agendaSchema.parse(data));
-        setLoading(false);
-      })
-      .catch(() => {
-        setError(`Could not load ${day === 'today' ? "today's" : "tomorrow's"} agenda`);
-        setLoading(false);
-      });
+    setDayInUrl(day);
   }, [day]);
 
   function handleChannelSelect(channel: ChannelEntry) {
@@ -98,6 +91,8 @@ export default function App() {
     return groups;
   }, [agenda, search]);
 
+  const error = !agenda;
+
   return (
     <div className="flex min-h-dvh flex-col overflow-x-hidden">
       <Header date={agenda?.date} day={day} onDayChange={setDay} />
@@ -107,22 +102,18 @@ export default function App() {
           <div className="absolute w-px top-0 bottom-0 left-0 bg-foreground/7 pointer-events-none overflow-clip line-glow-v" />
           <div className="absolute w-px top-0 bottom-0 right-0 bg-foreground/7 pointer-events-none overflow-clip line-glow-v-delayed" />
 
-        {!loading && !error && (agenda?.events.length ?? 0) > 0 && (
+        {!error && (agenda?.events.length ?? 0) > 0 && (
           <SearchBar search={search} onSearchChange={setSearch} />
         )}
 
         <main>
-          {loading && (
-            <div className="flex items-center justify-center px-4 py-20">
-              <div className="size-5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-primary" />
+          {error && (
+            <div className="px-4 py-20 text-center text-sm text-muted-foreground">
+              Could not load {day === 'today' ? "today's" : "tomorrow's"} agenda
             </div>
           )}
 
-          {error && (
-            <div className="px-4 py-20 text-center text-sm text-muted-foreground">{error}</div>
-          )}
-
-          {!loading && !error && groupedEvents.size === 0 && (
+          {!error && groupedEvents.size === 0 && (
             <div className="px-4 py-20 text-center text-sm text-muted-foreground">
               {search && (agenda?.events.length ?? 0) > 0
                 ? `No matches found for "${search}"`
@@ -130,7 +121,7 @@ export default function App() {
             </div>
           )}
 
-          {!loading && !error && groupedEvents.size > 0 && (
+          {!error && groupedEvents.size > 0 && (
             <div className="flex flex-col gap-6">
               {[...groupedEvents.entries()].map(([competition, events]) => (
                 <CompetitionSection

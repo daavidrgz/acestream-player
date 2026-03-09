@@ -1,6 +1,20 @@
 ---
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import App from '../components/App';
 import '../styles/global.css';
+
+function loadJson(filename: string): unknown {
+	try {
+		const filePath = resolve('public/data', filename);
+		return JSON.parse(readFileSync(filePath, 'utf-8'));
+	} catch {
+		return null;
+	}
+}
+
+const today = loadJson('agenda.json');
+const tomorrow = loadJson('agenda-tomorrow.json');
 ---
 
 <html lang="en">
@@ -16,6 +30,6 @@ import '../styles/global.css';
 			const dark = stored === 'dark' || (!stored && matchMedia('(prefers-color-scheme: dark)').matches);
 			document.documentElement.classList.toggle('dark', dark);
 		</script>
-		<App client:only="react" />
+		<App client:load today={today} tomorrow={tomorrow} />
 	</body>
 </html>

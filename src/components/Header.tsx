@@ -5,7 +5,9 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 export type Day = 'today' | 'tomorrow';
 
 function useTheme() {
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [dark, setDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark'),
+  );
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
