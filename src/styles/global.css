@@ -5,110 +5,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-error: #ef4444;
-}
-
 html, body {
   margin: 0;
   padding: 0;
-  min-height: 100dvh;
-  background: #f8f8f8;
-  color: #1a1a1a;
-  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Frame box with extending lines */
-.frame {
-  position: relative;
-}
-
-.frame-corner {
-  position: absolute;
-  width: 11px;
-  height: 11px;
-  z-index: 1;
-}
-
-.frame-corner::before,
-.frame-corner::after {
+.line-glow-v::after,
+.line-glow-v-delayed::after {
   content: '';
   position: absolute;
-  background: #333;
-}
-
-.frame-corner::before {
-  width: 100%;
-  height: 1px;
-  top: 5px;
-  left: 0;
-}
-
-.frame-corner::after {
-  width: 1px;
-  height: 100%;
-  left: 5px;
-  top: 0;
-}
-
-.frame-corner--tl { top: -5px; left: -5px; }
-.frame-corner--tr { top: -5px; right: -5px; }
-.frame-corner--bl { bottom: -5px; left: -5px; }
-.frame-corner--br { bottom: -5px; right: -5px; }
-
-/* Lines extending from box edges to screen edges */
-.frame-line {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.07);
-  pointer-events: none;
-  overflow: visible;
-}
-
-.frame-line::after {
-  content: '';
-  position: absolute;
-}
-
-/* Horizontal lines */
-.frame-line--top,
-.frame-line--bottom {
-  height: 1px;
-  left: -100vw;
-  right: -100vw;
-}
-
-.frame-line--top { top: 0; }
-.frame-line--bottom { bottom: 0; }
-
-.frame-line--top::after,
-.frame-line--bottom::after {
-  height: 100%;
-  width: 120px;
-  top: 0;
-  border-top: 1px solid rgba(59, 130, 246, 0.5);
-  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3));
-  animation: light-h 5s ease-in-out infinite;
-}
-
-.frame-line--bottom::after {
-  animation-delay: -2s;
-}
-
-/* Vertical lines */
-.frame-line--left,
-.frame-line--right {
-  width: 1px;
-  top: -100vh;
-  bottom: -100vh;
-}
-
-.frame-line--left { left: 0; }
-.frame-line--right { right: 0; }
-
-.frame-line--left::after,
-.frame-line--right::after {
   width: 100%;
   height: 120px;
   left: 0;
@@ -117,15 +24,8 @@ html, body {
   animation: light-v 5s ease-in-out infinite;
 }
 
-.frame-line--right::after {
+.line-glow-v-delayed::after {
   animation-delay: -2s;
-}
-
-@keyframes light-h {
-  0%, 100% { left: -120px; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { left: 100%; opacity: 0; }
 }
 
 @keyframes light-v {
@@ -244,6 +144,11 @@ html, body {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@utility text-xxs {
+  font-size: 0.625rem;
+  line-height: 0.875rem;
 }
 
 @layer base {

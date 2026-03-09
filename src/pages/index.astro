@@ -11,6 +11,11 @@ import '../styles/global.css';
 		<title>AceStream Player</title>
 	</head>
 	<body>
+		<script is:inline>
+			const stored = localStorage.getItem('theme');
+			const dark = stored === 'dark' || (!stored && matchMedia('(prefers-color-scheme: dark)').matches);
+			document.documentElement.classList.toggle('dark', dark);
+		</script>
 		<App client:only="react" />
 	</body>
 </html>
