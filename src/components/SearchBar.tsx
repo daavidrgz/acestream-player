@@ -15,7 +15,7 @@ export function SearchBar({ search, onSearchChange }: { search: string; onSearch
         {search && (
           <button
             onClick={() => onSearchChange('')}
-            className="absolute right-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+            className="cursor-pointer absolute right-8 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
           >
             <X className="size-4" />
           </button>

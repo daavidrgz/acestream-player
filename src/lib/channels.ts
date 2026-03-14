@@ -24,6 +24,10 @@ export enum Channel {
   DAZN_3 = 'DAZN 3',
   DAZN_4 = 'DAZN 4',
   DAZN_F1 = 'DAZN F1',
+  DAZN_LALIGA_1 = 'DAZN LaLiga 1',
+  DAZN_LALIGA_2 = 'DAZN LaLiga 2',
+  DAZN_1_BAR = 'DAZN 1 Bar',
+  DAZN_2_BAR = 'DAZN 2 Bar',
   M_LALIGA = 'M+ LaLiga',
   M_LALIGA_2 = 'M+ LaLiga 2',
   M_LIGA_DE_CAMPEONES = 'M+ Liga de Campeones',
@@ -46,6 +50,9 @@ export enum Channel {
   LALIGA_TV_BAR = 'LaLiga TV Bar',
   LALIGA_TV_BAR_2 = 'LaLiga TV Bar 2',
   LALIGA_TV_BAR_3 = 'LaLiga TV Bar 3',
+  HYPERMOTION = 'Hypermotion',
+  HYPERMOTION_2 = 'Hypermotion 2',
+  HYPERMOTION_3 = 'Hypermotion 3',
 }
 
 // --- Zod schemas ---
@@ -53,7 +60,8 @@ export enum Channel {
 const streamSchema = z.object({
   name: z.string(),
   id: z.string(),
-  resolution: z.enum(['FHD', 'HD']).nullable(),
+  resolution: z.enum(['FHD', 'HD']),
+  recommended: z.boolean().optional(),
 });
 
 const channelSchema = z.object({
@@ -93,6 +101,10 @@ export const CHANNEL_ICONS: Record<Channel, string> = {
   [Channel.DAZN_3]: '/icons/channels/dazn.svg',
   [Channel.DAZN_4]: '/icons/channels/dazn.svg',
   [Channel.DAZN_F1]: '/icons/channels/dazn.svg',
+  [Channel.DAZN_LALIGA_1]: '/icons/channels/dazn.svg',
+  [Channel.DAZN_LALIGA_2]: '/icons/channels/dazn.svg',
+  [Channel.DAZN_1_BAR]: '/icons/channels/dazn.svg',
+  [Channel.DAZN_2_BAR]: '/icons/channels/dazn.svg',
   [Channel.M_LALIGA]: '/icons/channels/mlaliga.svg',
   [Channel.M_LALIGA_2]: '/icons/channels/mlaliga.svg',
   [Channel.M_LIGA_DE_CAMPEONES]: '/icons/channels/mligadecampeones.svg',
@@ -115,6 +127,9 @@ export const CHANNEL_ICONS: Record<Channel, string> = {
   [Channel.LALIGA_TV_BAR]: '/icons/channels/laligatvbar.svg',
   [Channel.LALIGA_TV_BAR_2]: '/icons/channels/laligatvbar.svg',
   [Channel.LALIGA_TV_BAR_3]: '/icons/channels/laligatvbar.svg',
+  [Channel.HYPERMOTION]: '/icons/channels/laligatvbar.svg',
+  [Channel.HYPERMOTION_2]: '/icons/channels/laligatvbar.svg',
+  [Channel.HYPERMOTION_3]: '/icons/channels/laligatvbar.svg',
 };
 
 /** Maps canonical competition names → brand colors */

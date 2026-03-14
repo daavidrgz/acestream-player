@@ -63,7 +63,7 @@ export function Header({
           </ToggleGroup>
           <button
             onClick={toggleTheme}
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="cursor-pointer rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
             aria-label="Toggle theme"
           >
             {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}

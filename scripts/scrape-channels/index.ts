@@ -6,6 +6,19 @@ const OUT_PATH = resolve(import.meta.dirname!, '../../data/acestream-channels.js
 
 const PAGE_URL = 'https://ipfs.io/ipns/k2k4r8oqlcjxsritt5mczkcn4mmvcmymbqw7113fz2flkrerfwfps004/?tab=canales';
 
+// Acestream IDs personally verified to be reliable.
+const RECOMMENDED_STREAMS = new Set<string>([
+  '3ace1463a7cad979c3a4002b245487e9982e9f1a',
+  '0febfb5cac3384f487d55c559bbfc877db2d0357',
+  '4636ed75106cb00e9c70cc2029edf0a4df7ad73f',
+]);
+
+// Override resolution for specific streams.
+const RESOLUTION_OVERRIDES: Record<string, 'HD' | 'FHD'> = {
+  '0febfb5cac3384f487d55c559bbfc877db2d0357': 'FHD',
+  '4636ed75106cb00e9c70cc2029edf0a4df7ad73f': 'FHD',
+};
+
 async function main() {
   console.log('Fetching page...');
   const res = await fetch(PAGE_URL);
@@ -24,14 +37,14 @@ async function main() {
     let match;
     while ((match = cardPattern.exec(section)) !== null) {
       const name = match[1].trim();
-      const resolution = /\bFHD\b/i.test(name) ? 'FHD' as const
-        : /\bHD\b/i.test(name) ? 'HD' as const
-        : null;
+      const id = match[2].trim();
+      const resolution = RESOLUTION_OVERRIDES[id] ?? (/\bFHD\b/i.test(name) ? 'FHD' as const : 'HD' as const);
       channels.push({
         category,
         name,
-        id: match[2].trim(),
+        id,
         resolution,
+        ...(RECOMMENDED_STREAMS.has(id) ? { recommended: true } : {}),
       });
     }
   }

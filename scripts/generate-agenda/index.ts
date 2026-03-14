@@ -5,54 +5,68 @@ import he from 'he';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { Channel, Competition, agendaSchema, type Stream } from '../../src/lib/channels';
-import type { AcestreamEntry, RawEvent, EspnEntry } from './types';
+import type { ScrapedChannel } from '../scrape-channels/types';
+import type { RawEvent, EspnEntry } from './types';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = resolve(__dirname, '../../data/agenda.json');
 const CHANNELS_PATH = resolve(__dirname, '../../data/acestream-channels.json');
 
-// Maps scraped broadcast channel names (from futbolenlatv) → canonical channel name.
-// Each entry: [Channel, ...aliases]. Aliases are normalized (lowercased, trimmed).
-// Variants (HDR, bare names) all resolve to the same canonical name.
-const BROADCAST_ALIASES: [Channel, ...string[]][] = [
-  [Channel.DAZN_1, 'dazn', 'dazn 1'],
-  [Channel.DAZN_2, 'dazn 2'],
-  [Channel.DAZN_3, 'dazn 3'],
-  [Channel.DAZN_4, 'dazn 4'],
-  [Channel.DAZN_F1, 'dazn f1'],
-  [Channel.M_LALIGA, 'm+ laliga', 'm+ laliga hdr'],
-  [Channel.M_LALIGA_2, 'm+ laliga 2', 'm+ laliga hdr 2'],
-  [Channel.M_LIGA_DE_CAMPEONES, 'm+ liga de campeones', 'm+ liga de campeones hdr'],
-  [Channel.M_LIGA_DE_CAMPEONES_2, 'm+ liga de campeones 2', 'm+ liga de campeones hdr 2'],
-  [Channel.M_LIGA_DE_CAMPEONES_3, 'm+ liga de campeones 3', 'm+ liga de campeones hdr 3'],
-  [Channel.M_LIGA_DE_CAMPEONES_4, 'm+ liga de campeones 4', 'm+ liga de campeones hdr 4'],
-  [Channel.M_DEPORTES, 'm+ deportes'],
-  [Channel.M_DEPORTES_2, 'm+ deportes 2'],
-  [Channel.MOVISTAR_PLUS, 'movistar plus+'],
-  [Channel.VAMOS, 'm+ vamos'],
-  [Channel.GOL_PLAY, 'gol play'],
-  [Channel.EUROSPORT_1, 'eurosport 1'],
-  [Channel.EUROSPORT_2, 'eurosport 2'],
-  [Channel.TELEDEPORTE, 'teledeporte'],
-  [Channel.LA_1, 'la 1'],
-  [Channel.LA_2, 'la 2'],
-  [Channel.TV3, 'tv3'],
-  [Channel.ETB, 'etb 1'],
-  [Channel.MEGA, 'mega'],
-  [Channel.LALIGA_TV_BAR, 'laligatv bar', 'laliga tv bar'],
-  [Channel.LALIGA_TV_BAR_2, 'laliga tv m2', 'laliga tv bar 2'],
-  [Channel.LALIGA_TV_BAR_3, 'laliga tv m3', 'laliga tv bar 3'],
-];
-
-const BROADCAST_MAP: Record<string, Channel> = Object.fromEntries(
-  BROADCAST_ALIASES.flatMap(([channel, ...aliases]) => aliases.map(a => [a, channel]))
-);
+// Maps exact raw channel names (from futbolenlatv, lowercased) → canonical channel name.
+// Names sourced from https://www.futbolenlatv.es/canal
+const BROADCAST_MAP: Record<string, Channel> = {
+  // DAZN
+  'dazn 1 (m71)': Channel.DAZN_1,
+  'dazn 2 (m72)': Channel.DAZN_2,
+  'dazn 3 (m196)': Channel.DAZN_3,
+  'dazn 4 (m197)': Channel.DAZN_4,
+  'dazn laliga (m55 o113)': Channel.DAZN_LALIGA_1,
+  'dazn laliga 2 (m58 o114)': Channel.DAZN_LALIGA_2,
+  'dazn 1 bar (m148)': Channel.DAZN_1_BAR,
+  'dazn 2 bar (m149)': Channel.DAZN_2_BAR,
+  // Movistar+ LaLiga
+  'm+ laliga (m54 o110)': Channel.M_LALIGA,
+  'm+ laliga 2 (m57 o112)': Channel.M_LALIGA_2,
+  'm+ laliga hdr (m440 o111)': Channel.M_LALIGA,
+  // Movistar+ Liga de Campeones
+  'm+ liga de campeones (m60 o115)': Channel.M_LIGA_DE_CAMPEONES,
+  'm+ liga de campeones 2 (m61 o117)': Channel.M_LIGA_DE_CAMPEONES_2,
+  'm+ liga de campeones 3 (m62 o118)': Channel.M_LIGA_DE_CAMPEONES_3,
+  'm+ liga de campeones 4 (m180 o119)': Channel.M_LIGA_DE_CAMPEONES_4,
+  // Movistar+ Deportes
+  'movistar plus+ (m7): ver partido': Channel.MOVISTAR_PLUS,
+  'm+ deportes': Channel.M_DEPORTES,
+  'm+ deportes 2': Channel.M_DEPORTES_2,
+  // Movistar+ Vamos
+  'm+ vamos (8 y 50)': Channel.VAMOS,
+  // Other
+  'gol play': Channel.GOL_PLAY,
+  'teledeporte': Channel.TELEDEPORTE,
+  'la 1 tve': Channel.LA_1,
+  'tv3 (cataluña)': Channel.TV3,
+  'etb1 (país vasco)': Channel.ETB,
+  'eurosport 1': Channel.EUROSPORT_1,
+  'eurosport 2': Channel.EUROSPORT_2,
+  'mega': Channel.MEGA,
+  // LaLiga TV Bar
+  'laliga tv bar': Channel.LALIGA_TV_BAR,
+  'laliga tv m2': Channel.LALIGA_TV_BAR_2,
+  'laliga tv m3': Channel.LALIGA_TV_BAR_3,
+  'laliga tv m4': Channel.LALIGA_TV_BAR_3,
+  // Hypermotion
+  'laliga tv hypermotion (m56 o120): ver partido': Channel.HYPERMOTION,
+  'laliga tv hypermotion 2 (m59 o121): ver partido': Channel.HYPERMOTION_2,
+};
 
 // Maps acestream channel names → canonical channel name.
 // Each entry: [regex, channelName]. Order matters — more specific patterns first.
 // Tested against each acestream stream name to classify it.
 const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
   [/\bDAZN F1\b/i, Channel.DAZN_F1],
+  [/\bDAZN\s+2\s+BAR\b/i, Channel.DAZN_2_BAR],
+  [/\bDAZN\s+\d+\s+BAR\b/i, Channel.DAZN_1_BAR],
+  [/\bDAZN\s+LA\s+LIGA\s+2\b/i, Channel.DAZN_LALIGA_2],
+  [/\bDAZN\s+LA\s+LIGA\s+1?\b/i, Channel.DAZN_LALIGA_1],
   [/\bDAZN 1\b/i, Channel.DAZN_1],
   [/\bDAZN 2\b/i, Channel.DAZN_2],
   [/\bDAZN 3\b/i, Channel.DAZN_3],
@@ -97,14 +111,18 @@ const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
   [/\bLaLiga\s*TV\s*M2\b/i, Channel.LALIGA_TV_BAR_2],
   [/\bLaLiga\s*TV\s*Bar\s*3\b/i, Channel.LALIGA_TV_BAR_3],
   [/\bLaLiga\s*TV\s*M3\b/i, Channel.LALIGA_TV_BAR_3],
+  [/\bHYPERMOTION\s+3\b/i, Channel.HYPERMOTION_3],
+  [/\bHYPERMOTION\s+2\b/i, Channel.HYPERMOTION_2],
+  [/\bHYPERMOTION\b/i, Channel.HYPERMOTION],
 ];
 
 // Channels to exclude from output (ticket sales, free apps, non-streamable, etc.)
+// Values are exact raw names from futbolenlatv, lowercased.
 const EXCLUDE_CHANNELS = new Set([
   'hellotickets', 'fifa+',
-  'laliga+ plus', 'movistar plus+: ver partido',
-  'laliga tv hypermotion: ver partido', 'laliga tv hypermotion 2: ver partido',
-  'dazn app gratis',
+  'laliga+ plus',
+  'dazn app gratis (ver gratis)',
+  'dazn (ver en directo)',
 ]);
 
 // Competition config: maps futbolenlatv slug → canonical name + ESPN league code.
@@ -126,19 +144,6 @@ const COMPETITION_CONFIG: Record<string, { name: Competition; espn?: string }> =
 };
 
 const INCLUDE_COMPETITIONS = new Set(Object.keys(COMPETITION_CONFIG));
-
-// Strip channel descriptor suffixes like "(M54 O110)", "(Ver en directo)", "(Ver gratis)"
-function cleanChannel(raw: string) {
-  return raw
-    .replace(/\s*\((?:M\d+|O\d+|Ver[^)]*|Comprar[^)]*)[^)]*\)/gi, '')
-    .replace(/\s*\(M\d+\s+O\d+\)/g, '')
-    .trim();
-}
-
-// Normalize for BROADCAST_MAP lookup
-function normalizeChannel(name: string) {
-  return name.toLowerCase().trim();
-}
 
 // Decode HTML entities (&#225; → á, &#233; → é, etc.)
 function decodeEntities(str: string) {
@@ -203,9 +208,8 @@ function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
       let liMatch;
       while ((liMatch = liRe.exec(canalesMatch[1])) !== null) {
         const rawName = decodeEntities(liMatch[1]);
-        const cleaned = cleanChannel(rawName);
-        if (cleaned && !EXCLUDE_CHANNELS.has(normalizeChannel(cleaned))) {
-          channels.push(cleaned);
+        if (rawName && !EXCLUDE_CHANNELS.has(rawName.toLowerCase())) {
+          channels.push(rawName);
         }
       }
     }
@@ -284,13 +288,13 @@ function findEspnTeam(teamName: string, espnTeams: Map<string, EspnEntry>) {
   return null;
 }
 
-function loadAcestreams(): AcestreamEntry[] {
+function loadAcestreams(): ScrapedChannel[] {
   return JSON.parse(readFileSync(CHANNELS_PATH, 'utf-8'));
 }
 
 // Classify all acestream streams by standard channel name (once per run).
 // Returns Map<channelName, Array<Stream>>
-function classifyAcestreams(acestreams: AcestreamEntry[]) {
+function classifyAcestreams(acestreams: ScrapedChannel[]) {
   const byChannel = new Map<Channel, Stream[]>();
 
   for (const stream of acestreams) {
@@ -305,7 +309,8 @@ function classifyAcestreams(acestreams: AcestreamEntry[]) {
         byChannel.get(standard)!.push({
           name,
           id: stream.id,
-          resolution: stream.resolution ?? null,
+          resolution: stream.resolution,
+          ...(stream.recommended ? { recommended: true } : {}),
         });
         break; // first match wins
       }
@@ -331,9 +336,9 @@ function classifyAcestreams(acestreams: AcestreamEntry[]) {
 function deduplicateChannels(channels: string[], classifiedStreams: Map<Channel, Stream[]>) {
   const seen = new Map();
   for (const ch of channels) {
-    const standard = BROADCAST_MAP[normalizeChannel(ch)];
+    const standard = BROADCAST_MAP[ch.toLowerCase()];
     if (!standard) {
-      console.warn(`Unknown broadcast channel: "${ch}" (normalized: "${normalizeChannel(ch)}")`);
+      console.warn(`Unknown broadcast channel: "${ch}"`);
       continue;
     }
     if (seen.has(standard)) continue;
@@ -387,7 +392,7 @@ async function main() {
 
   // Fetch ESPN badges for all competitions across both days
   const allRaw = [...todayRaw, ...tomorrowRaw];
-  const espnCodes = [...new Set(allRaw.map(ev => COMPETITION_CONFIG[ev.compSlug]?.espn).filter(Boolean))];
+  const espnCodes = [...new Set(allRaw.map(ev => COMPETITION_CONFIG[ev.compSlug]?.espn).filter((c): c is string => Boolean(c)))];
   console.log(`Fetching ESPN badges for: ${espnCodes.join(', ') || 'none'}...`);
   const espnTeams = await fetchEspnTeams(espnCodes);
   console.log(`Got ${espnTeams.size} ESPN team entries`);
