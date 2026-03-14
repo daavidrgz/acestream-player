@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { agendaSchema, type Agenda, type ChannelEntry, type Stream, type Event } from '@/lib/channels';
 import { CompetitionSection } from '@/components/CompetitionSection';
 import { Header, type Day } from '@/components/Header';
+import { SportSwitcher, type Sport } from '@/components/SportSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { StreamDialog } from '@/components/StreamDialog';
 import { PlayerDialog } from '@/components/PlayerDialog';
@@ -43,6 +44,7 @@ export default function App({ today, tomorrow }: Props) {
   );
 
   const [day, setDay] = useState<Day>(getDayFromUrl);
+  const [sport, setSport] = useState<Sport>('football');
   const [search, setSearch] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelEntry | null>(null);
   const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
@@ -101,6 +103,8 @@ export default function App({ today, tomorrow }: Props) {
         <div className="relative mx-auto flex w-[90%] flex-1 flex-col">
           <div className="absolute w-px top-0 bottom-0 left-0 bg-foreground/7 pointer-events-none overflow-clip line-glow-v" />
           <div className="absolute w-px top-0 bottom-0 right-0 bg-foreground/7 pointer-events-none overflow-clip line-glow-v-delayed" />
+
+        <SportSwitcher value={sport} onChange={setSport} />
 
         {!error && (agenda?.events.length ?? 0) > 0 && (
           <SearchBar search={search} onSearchChange={setSearch} />

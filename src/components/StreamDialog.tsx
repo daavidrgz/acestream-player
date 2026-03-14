@@ -51,7 +51,7 @@ function groupStreams(streams: Stream[]): ProviderGroup[] {
 
 const resolutionColors: Record<string, string> = {
   FHD: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-  HD: 'bg-sky-500/15 text-sky-400 border-sky-500/20',
+  HD: 'bg-muted text-muted-foreground border-border',
 };
 
 function ResolutionBadge({ resolution }: { resolution: string }) {
