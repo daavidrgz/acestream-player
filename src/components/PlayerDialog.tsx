@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Copy, Check, ArrowLeft } from 'lucide-react';
+import { Copy, Check, ArrowLeft, Monitor, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Stream } from '@/lib/channels';
 import type { AcestreamStatus } from '@/lib/useLocalAcestream';
@@ -21,6 +21,62 @@ const PLAYERS = [
   { name: 'nPlayer', icon: '/icons/nplayer.png', scheme: (url: string) => `nplayer-${url}` },
 ] as const;
 
+function SectionHeader({
+  icon,
+  label,
+  trailing,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+      {icon}
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      {trailing && <div className="ml-auto">{trailing}</div>}
+    </div>
+  );
+}
+
+function PlayerRow({
+  icon,
+  label,
+  sublabel,
+  isLast,
+  className,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  sublabel?: string;
+  isLast: boolean;
+  className?: string;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        'flex cursor-pointer items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-secondary/50',
+        !isLast && 'border-b border-border/50',
+        isLast && 'rounded-b-xl',
+        className,
+      )}
+      onClick={onClick}
+    >
+      {icon}
+      <div className="flex flex-col">
+        <span>{label}</span>
+        {sublabel && (
+          <span className="text-xs text-muted-foreground">{sublabel}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function PlayerDialog({
   stream,
   showBack,
@@ -36,7 +92,8 @@ export function PlayerDialog({
 }) {
   const [copied, setCopied] = useState(false);
 
-  function handleCopy() {
+  function handleCopy(e: React.MouseEvent) {
+    e.stopPropagation();
     if (!stream) return;
     const streamUrl = `${BASE_URL}${stream.id}`;
 
@@ -80,23 +137,6 @@ export function PlayerDialog({
 
   const isConnected = acestream.status === 'connected';
 
-  const items = [
-    ...(isConnected
-      ? [
-          {
-            key: 'local-acestream',
-            label: 'Local Acestream',
-            icon: <img src="/icons/acestream.svg" alt="" className="size-5" />,
-            onClick: handleLocalAcestream,
-            sublabel: 'Open with local engine',
-            highlight: true,
-          },
-        ]
-      : []),
-    { key: 'copy', label: copied ? 'Copied!' : 'Copy Link', icon: copied ? <Check className="size-5 text-green-500" /> : <Copy className="size-5" />, onClick: handleCopy },
-    ...PLAYERS.map((p) => ({ key: p.name, label: p.name, icon: <img src={p.icon} alt="" className="size-5" />, onClick: () => openIn(p) })),
-  ];
-
   return (
     <Dialog open={!!stream} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="p-0">
@@ -114,25 +154,53 @@ export function PlayerDialog({
           </div>
           <DialogDescription>{stream?.name}</DialogDescription>
         </DialogHeader>
+
         <div>
-          {items.map((item, i) => (
-            <div
-              key={item.key}
-              className={cn(
-                'flex cursor-pointer items-center gap-3 px-4 py-3.5 text-sm transition-colors hover:bg-secondary/50',
-                i === items.length - 1 ? 'rounded-b-xl' : 'border-b border-border/50',
-                'highlight' in item && item.highlight && 'text-green-500',
-              )}
-              onClick={item.onClick}
-            >
-              {item.icon}
-              <div className="flex flex-col">
-                <span>{item.label}</span>
-                {'sublabel' in item && item.sublabel && (
-                  <span className="text-xs text-muted-foreground">{item.sublabel}</span>
+          {/* Local section */}
+          {isConnected && (
+            <>
+              <SectionHeader
+                icon={<Monitor className="size-3.5 text-muted-foreground" />}
+                label="Local"
+              />
+              <PlayerRow
+                icon={<img src="/icons/acestream.svg" alt="" className="size-5" />}
+                label="Local Acestream"
+                sublabel="Open with local engine"
+                isLast={false}
+                className="text-green-500"
+                onClick={handleLocalAcestream}
+              />
+            </>
+          )}
+
+          {/* Remote section */}
+          <SectionHeader
+            icon={<Globe className="size-3.5 text-muted-foreground" />}
+            label="Remote"
+            trailing={
+              <button
+                onClick={handleCopy}
+                className={cn(
+                  'flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] transition-colors',
+                  copied
+                    ? 'text-green-500'
+                    : 'text-muted-foreground/60 hover:bg-secondary/60 hover:text-muted-foreground',
                 )}
-              </div>
-            </div>
+              >
+                {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+                {copied ? 'Copied!' : 'Copy link'}
+              </button>
+            }
+          />
+          {PLAYERS.map((player, i) => (
+            <PlayerRow
+              key={player.name}
+              icon={<img src={player.icon} alt="" className="size-5" />}
+              label={player.name}
+              isLast={i === PLAYERS.length - 1}
+              onClick={() => openIn(player)}
+            />
           ))}
         </div>
       </DialogContent>
