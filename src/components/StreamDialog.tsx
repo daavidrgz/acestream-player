@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Star, List, Tv } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ChannelEntry, Stream } from '@/lib/channels';
@@ -79,6 +79,8 @@ function StreamRow({
   total: number;
   onSelect: (stream: Stream) => void;
 }) {
+  const [copied, setCopied] = useState(false);
+
   return (
     <button
       type="button"
@@ -97,17 +99,31 @@ function StreamRow({
       </span>
       <ResolutionBadge resolution={stream.resolution} />
       <span
-        className="group/id relative ml-auto cursor-pointer font-mono text-[11px] text-muted-foreground/50 transition-colors hover:text-muted-foreground"
+        className={cn(
+          'group/id relative ml-auto cursor-pointer font-mono text-[11px] transition-colors',
+          copied
+            ? 'text-emerald-400'
+            : 'text-muted-foreground/50 hover:text-muted-foreground',
+        )}
         role="button"
         tabIndex={-1}
         onClick={(e) => {
           e.stopPropagation();
           navigator.clipboard.writeText(stream.id);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
         }}
       >
         {stream.id.slice(0, 6)}
-        <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-popover px-1.5 py-0.5 text-[10px] text-popover-foreground shadow opacity-0 transition-opacity group-hover/id:opacity-100">
-          Copy&nbsp;ID
+        <span
+          className={cn(
+            'pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-[10px] shadow transition-opacity',
+            copied
+              ? 'bg-emerald-500/20 text-emerald-400 opacity-100'
+              : 'bg-popover text-popover-foreground opacity-0 group-hover/id:opacity-100',
+          )}
+        >
+          {copied ? 'Copied!' : 'Copy\u00a0ID'}
         </span>
       </span>
     </button>
