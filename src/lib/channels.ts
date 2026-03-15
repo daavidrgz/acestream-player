@@ -1,7 +1,14 @@
 import { z } from 'zod';
 
+/** Canonical sport identifiers. */
+export enum Sport {
+  FOOTBALL = 'football',
+  TENNIS = 'tennis',
+}
+
 /** Canonical competition identifiers. */
 export enum Competition {
+  // Football
   LALIGA_EA_SPORTS = 'LaLiga EA Sports',
   LALIGA_HYPERMOTION = 'LaLiga Hypermotion',
   PREMIER_LEAGUE = 'Premier League',
@@ -15,6 +22,21 @@ export enum Competition {
   SUPERCOPA_ESPANA = 'Supercopa de España',
   PRIMERA_FEDERACION = 'Primera Federación',
   LIGA_F = 'Liga F',
+  // Tennis – Grand Slams
+  ROLAND_GARROS = 'Roland Garros',
+  WIMBLEDON = 'Wimbledon',
+  // Tennis – ATP
+  ATP_MASTERS_1000 = 'ATP Masters 1000',
+  ATP_500 = 'ATP 500',
+  ATP_250 = 'ATP 250',
+  ATP_FINALS = 'ATP Finals',
+  // Tennis – WTA
+  WTA_1000 = 'WTA 1000',
+  WTA_500 = 'WTA 500',
+  WTA_250 = 'WTA 250',
+  // Tennis – Other
+  LAVER_CUP = 'Laver Cup',
+  BJK_CUP = 'Billie Jean King Cup',
 }
 
 /** Canonical channel identifiers. Single source of truth for channel names across the codebase. */
@@ -53,6 +75,8 @@ export enum Channel {
   HYPERMOTION = 'Hypermotion',
   HYPERMOTION_2 = 'Hypermotion 2',
   HYPERMOTION_3 = 'Hypermotion 3',
+  M_DEPORTES_3 = 'M+ Deportes 3',
+  VAMOS_BAR = 'M+ #Vamos Bar',
 }
 
 // --- Zod schemas ---
@@ -74,8 +98,11 @@ const teamSchema = z.object({
   badge: z.string(),
 });
 
+const sportSchema = z.nativeEnum(Sport);
+
 const eventSchema = z.object({
   time: z.string(),
+  sport: sportSchema,
   competition: z.nativeEnum(Competition),
   homeTeam: teamSchema,
   awayTeam: teamSchema,
@@ -130,6 +157,8 @@ export const CHANNEL_ICONS: Record<Channel, string> = {
   [Channel.HYPERMOTION]: '/icons/channels/laligatvbar.svg',
   [Channel.HYPERMOTION_2]: '/icons/channels/laligatvbar.svg',
   [Channel.HYPERMOTION_3]: '/icons/channels/laligatvbar.svg',
+  [Channel.M_DEPORTES_3]: '/icons/channels/mdeportes.svg',
+  [Channel.VAMOS_BAR]: '/icons/channels/vamos.svg',
 };
 
 /** Maps canonical competition names → brand colors */
@@ -147,6 +176,18 @@ export const COMPETITION_COLORS: Record<Competition, string> = {
   [Competition.SUPERCOPA_ESPANA]: '#d4af37',
   [Competition.PRIMERA_FEDERACION]: '#004b87',
   [Competition.LIGA_F]: '#5f29ff',
+  // Tennis
+  [Competition.ROLAND_GARROS]: '#d35400',
+  [Competition.WIMBLEDON]: '#006633',
+  [Competition.ATP_MASTERS_1000]: '#0c2340',
+  [Competition.ATP_500]: '#0c2340',
+  [Competition.ATP_250]: '#0c2340',
+  [Competition.ATP_FINALS]: '#e4002b',
+  [Competition.WTA_1000]: '#6a1b9a',
+  [Competition.WTA_500]: '#6a1b9a',
+  [Competition.WTA_250]: '#6a1b9a',
+  [Competition.LAVER_CUP]: '#1a1a1a',
+  [Competition.BJK_CUP]: '#00a651',
 };
 
 /** Maps canonical competition names → icon paths (relative to public/) */
@@ -164,4 +205,16 @@ export const COMPETITION_ICONS: Record<Competition, string> = {
   [Competition.SUPERCOPA_ESPANA]: '/icons/competitions/supercopa-espana.svg',
   [Competition.PRIMERA_FEDERACION]: '/icons/competitions/primera-federacion.svg',
   [Competition.LIGA_F]: '/icons/competitions/liga-f.svg',
+  // Tennis
+  [Competition.ROLAND_GARROS]: '/icons/competitions/roland-garros.svg',
+  [Competition.WIMBLEDON]: '/icons/competitions/wimbledon.svg',
+  [Competition.ATP_MASTERS_1000]: '/icons/competitions/atp.svg',
+  [Competition.ATP_500]: '/icons/competitions/atp.svg',
+  [Competition.ATP_250]: '/icons/competitions/atp.svg',
+  [Competition.ATP_FINALS]: '/icons/competitions/atp.svg',
+  [Competition.WTA_1000]: '/icons/competitions/wta.svg',
+  [Competition.WTA_500]: '/icons/competitions/wta.svg',
+  [Competition.WTA_250]: '/icons/competitions/wta.svg',
+  [Competition.LAVER_CUP]: '/icons/competitions/laver-cup.svg',
+  [Competition.BJK_CUP]: '/icons/competitions/bjk-cup.svg',
 };

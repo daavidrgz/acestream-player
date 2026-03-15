@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { agendaSchema, type Agenda, type ChannelEntry, type Stream, type Event } from '@/lib/channels';
+import { agendaSchema, Sport, type Agenda, type ChannelEntry, type Stream, type Event } from '@/lib/channels';
 import { CompetitionSection } from '@/components/CompetitionSection';
 import { Header, type Day } from '@/components/Header';
-import { SportSwitcher, type Sport } from '@/components/SportSwitcher';
+import { SportSwitcher } from '@/components/SportSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { StreamDialog } from '@/components/StreamDialog';
 import { PlayerDialog } from '@/components/PlayerDialog';
@@ -44,7 +44,7 @@ export default function App({ today, tomorrow }: Props) {
   );
 
   const [day, setDay] = useState<Day>(getDayFromUrl);
-  const [sport, setSport] = useState<Sport>('football');
+  const [sport, setSport] = useState<Sport>(Sport.FOOTBALL);
   const [search, setSearch] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelEntry | null>(null);
   const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
@@ -74,15 +74,16 @@ export default function App({ today, tomorrow }: Props) {
 
   const groupedEvents = useMemo(() => {
     const all = agenda?.events ?? [];
+    const bySport = all.filter((e) => e.sport === sport);
     const filtered = search.trim()
-      ? all.filter((e) => {
+      ? bySport.filter((e) => {
           const q = search.toLowerCase();
           return (
             e.homeTeam.name.toLowerCase().includes(q) ||
             e.awayTeam.name.toLowerCase().includes(q)
           );
         })
-      : all;
+      : bySport;
 
     const groups = new Map<string, Event[]>();
     for (const event of filtered) {
@@ -91,7 +92,7 @@ export default function App({ today, tomorrow }: Props) {
       groups.get(key)!.push(event);
     }
     return groups;
-  }, [agenda, search]);
+  }, [agenda, search, sport]);
 
   const error = !agenda;
 

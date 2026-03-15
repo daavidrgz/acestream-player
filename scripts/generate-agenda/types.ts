@@ -1,5 +1,8 @@
+import type { Sport } from '../../src/lib/channels';
+
 export interface RawEvent {
   time: string;
+  sport: Sport;
   competition: string;
   compSlug: string;
   homeTeam: { name: string; badge: string };
