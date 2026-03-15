@@ -320,8 +320,11 @@ function extractTeam(html: string) {
 // Map abbreviated/alternate team names (normalized) to ESPN-normalized names
 const TEAM_ALIASES: Record<string, string> = {
   'at. madrid': 'atletico madrid',
+  'atletico de madrid': 'atletico madrid',
   'ath. bilbao': 'athletic bilbao',  // Athletic Club
   'ath bilbao': 'athletic bilbao',
+  'manchester utd.': 'manchester united',
+  'manchester utd': 'manchester united',
 };
 
 function normalizeTeamName(name: string) {
