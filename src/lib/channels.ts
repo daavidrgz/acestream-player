@@ -115,6 +115,12 @@ export enum Channel {
   ESPN_2 = 'ESPN 2',
   FOX_SPORTS_1 = 'FOX Sports 1',
   FOX_SPORTS_2 = 'FOX Sports 2',
+  // US channels
+  ABC = 'ABC',
+  NBC = 'NBC',
+  CBS_SPORTS = 'CBS Sports',
+  USA_NETWORK = 'USA Network',
+  NBA_TV = 'NBA TV',
 }
 
 // --- Zod schemas ---
@@ -226,6 +232,12 @@ export const CHANNEL_ICONS: Record<Channel, string> = {
   [Channel.ESPN_2]: '/icons/channels/espn.svg',
   [Channel.FOX_SPORTS_1]: '/icons/channels/fox-sports.svg',
   [Channel.FOX_SPORTS_2]: '/icons/channels/fox-sports.svg',
+  // US channels
+  [Channel.ABC]: '/icons/channels/abc.svg',
+  [Channel.NBC]: '/icons/channels/nbc.svg',
+  [Channel.CBS_SPORTS]: '/icons/channels/cbs-sports.svg',
+  [Channel.USA_NETWORK]: '/icons/channels/usa-network.svg',
+  [Channel.NBA_TV]: '/icons/channels/nba-tv.svg',
 };
 
 /** Maps canonical competition names → brand colors */

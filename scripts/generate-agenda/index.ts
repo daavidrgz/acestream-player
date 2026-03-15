@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { Channel, Competition, Sport, agendaSchema, type Stream } from '../../src/lib/channels';
 import type { ScrapedChannel } from '../scrape-channels/types';
 import type { RawEvent, EspnEntry } from './types';
+import { scrapeEspnScoreboard, ESPN_BROADCAST_MAP } from './espn-scoreboard';
 import { scrapeWheresthematch, WTM_BROADCAST_MAP } from './wheresthematch';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -158,6 +159,13 @@ const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
   [/\bESPN\b/i, Channel.ESPN],
   [/\bFox\s*Sports?\s+2\b/i, Channel.FOX_SPORTS_2],
   [/\bFox\s*Sports?\s+1\b/i, Channel.FOX_SPORTS_1],
+  // US channels
+  [/\bNBA\s*TV\b/i, Channel.NBA_TV],
+  [/\bUSA\s*Network\b/i, Channel.USA_NETWORK],
+  [/\bCBS\s*Sports?\b/i, Channel.CBS_SPORTS],
+  [/\bNBCS?N?\b/i, Channel.NBC],
+  [/\bNBC\b/i, Channel.NBC],
+  [/\bABC\b/i, Channel.ABC],
 ];
 
 // Channels to exclude from output (ticket sales, free apps, non-streamable, etc.)
@@ -706,7 +714,7 @@ function classifyAcestreams(acestreams: ScrapedChannel[]) {
 function deduplicateChannels(channels: string[], classifiedStreams: Map<Channel, Stream[]>) {
   const seen = new Map();
   for (const ch of channels) {
-    const standard = BROADCAST_MAP[ch.toLowerCase()] ?? WTM_BROADCAST_MAP[ch];
+    const standard = BROADCAST_MAP[ch.toLowerCase()] ?? WTM_BROADCAST_MAP[ch] ?? ESPN_BROADCAST_MAP[ch];
     if (!standard) {
       console.warn(`Unknown broadcast channel: "${ch}"`);
       continue;
@@ -877,14 +885,16 @@ async function main() {
   tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
   const tomorrowDate = tomorrowDateObj.toISOString().split('T')[0];
 
-  // Fetch both sources in parallel
-  console.log('Fetching futbolenlatv.es and wheresthematch.com...');
-  const [footballHtml, tennisHtml, basketballHtml, wtmToday, wtmTomorrow] = await Promise.all([
+  // Fetch all sources in parallel
+  console.log('Fetching futbolenlatv.es, wheresthematch.com and ESPN scoreboard...');
+  const [footballHtml, tennisHtml, basketballHtml, wtmToday, wtmTomorrow, espnToday, espnTomorrow] = await Promise.all([
     fetchHTML('https://www.futbolenlatv.es/'),
     fetchHTML('https://www.futbolenlatv.es/deporte/tenis'),
     fetchHTML('https://www.futbolenlatv.es/deporte/baloncesto'),
     scrapeWheresthematch(todayDate, true),
     scrapeWheresthematch(tomorrowDate, false),
+    scrapeEspnScoreboard(todayDate),
+    scrapeEspnScoreboard(tomorrowDate),
   ]);
 
   console.log('Parsing football events...');
@@ -902,12 +912,12 @@ async function main() {
   const basketballTomorrowRaw = parseBasketballEvents(basketballHtml, 'tomorrow');
   console.log(`Found ${basketballTodayRaw.length} basketball events for today, ${basketballTomorrowRaw.length} for tomorrow`);
 
-  // Merge futbolenlatv (primary) with wheresthematch (secondary)
+  // Merge futbolenlatv (primary) → wheresthematch (secondary) → ESPN scoreboard (tertiary)
   const ftlvToday = [...footballTodayRaw, ...tennisTodayRaw, ...basketballTodayRaw];
   const ftlvTomorrow = [...footballTomorrowRaw, ...tennisTomorrowRaw, ...basketballTomorrowRaw];
 
-  const todayRaw = mergeEvents(ftlvToday, wtmToday);
-  const tomorrowRaw = mergeEvents(ftlvTomorrow, wtmTomorrow);
+  const todayRaw = mergeEvents(mergeEvents(ftlvToday, wtmToday), espnToday);
+  const tomorrowRaw = mergeEvents(mergeEvents(ftlvTomorrow, wtmTomorrow), espnTomorrow);
   console.log(`After merge: ${todayRaw.length} events today, ${tomorrowRaw.length} events tomorrow`);
 
   // Fetch ESPN data for badges/headshots (using merged events to capture both sources)
