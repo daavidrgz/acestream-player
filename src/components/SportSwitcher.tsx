@@ -1,10 +1,11 @@
-import { Volleyball, CircleDot, type LucideIcon } from 'lucide-react';
+import { Volleyball, CircleDot, Trophy, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sport } from '@/lib/channels';
 
 const SPORTS: { value: Sport; label: string; icon: LucideIcon }[] = [
   { value: Sport.FOOTBALL, label: 'Football', icon: Volleyball },
   { value: Sport.TENNIS, label: 'Tennis', icon: CircleDot },
+  { value: Sport.BASKETBALL, label: 'Basketball', icon: Trophy },
 ];
 
 export function SportSwitcher({

@@ -50,13 +50,6 @@
   {
     "category": "DAZN",
     "name": "DAZN 1 --> ELCANO",
-    "id": "dddff67edfa7061f643ec5ae0be110169850363d",
-    "resolution": "HD",
-    "recommended": true
-  },
-  {
-    "category": "DAZN",
-    "name": "DAZN 1 --> ELCANO",
     "id": "9afc89481b721ce6c326c85e47148676077b8e62",
     "resolution": "HD"
   },
@@ -64,12 +57,6 @@
     "category": "DAZN",
     "name": "DAZN 1 --> ELCANO",
     "id": "7ba1f321f4d0791b7ebd42f41a07c1cd1479e784",
-    "resolution": "HD"
-  },
-  {
-    "category": "DAZN",
-    "name": "DAZN 1 --> NEW LOOP",
-    "id": "0560234787945a17522e284c4c22bb4df29f33b0",
     "resolution": "HD"
   },
   {
@@ -105,19 +92,13 @@
   {
     "category": "DAZN",
     "name": "DAZN 2 --> ELCANO",
-    "id": "d60b8c154828cb990b7bb1570764b215bd979e74",
-    "resolution": "HD"
-  },
-  {
-    "category": "DAZN",
-    "name": "DAZN 2 --> ELCANO",
     "id": "13a16a0630ae87bd97d6ba4165963c201c9a2e9c",
     "resolution": "HD"
   },
   {
     "category": "DAZN",
-    "name": "DAZN 2 --> NEW LOOP",
-    "id": "c93a0d4914713db942fbb210bac467b0224c63a6",
+    "name": "DAZN 2 --> ELCANO",
+    "id": "d60b8c154828cb990b7bb1570764b215bd979e74",
     "resolution": "HD"
   },
   {
@@ -152,12 +133,6 @@
   },
   {
     "category": "DAZN",
-    "name": "DAZN 3 --> NEW LOOP",
-    "id": "98fba924421aa1e4bd28e74d74a2726d0459b594",
-    "resolution": "HD"
-  },
-  {
-    "category": "DAZN",
     "name": "DAZN 3 --> SPORT TV",
     "id": "d1d9ec2361a6ac8edc0b2841866383768cc28df9",
     "resolution": "HD"
@@ -176,8 +151,8 @@
   },
   {
     "category": "DAZN",
-    "name": "DAZN 4 --> NEW LOOP",
-    "id": "c21a2524a8de3e1e5b126f2677a3e993d9aa07c4",
+    "name": "DAZN 4 --> ELCANO",
+    "id": "9ced16b2055c99bf89c26e678e315e1b01d3734c",
     "resolution": "HD"
   },
   {
@@ -218,20 +193,8 @@
   },
   {
     "category": "DEPORTES",
-    "name": "SKY SPORTS ARENA --> NEW LOOP",
-    "id": "37796ca47026bc190c7dc26827c0dfb6b61d137b",
-    "resolution": "HD"
-  },
-  {
-    "category": "DEPORTES",
     "name": "SKY SPORTS ARENA --> SPORT TV",
     "id": "d317a003e8047da2c36a2a2bb2289578c9a3b79c",
-    "resolution": "HD"
-  },
-  {
-    "category": "DEPORTES",
-    "name": "SKY SPORTS CRICKET --> NEW LOOP",
-    "id": "610eefafd6602c094e8e89c249a11d635cb6fe29",
     "resolution": "HD"
   },
   {
@@ -244,12 +207,6 @@
     "category": "DEPORTES",
     "name": "SKY SPORTS MAIN EVENT --> ELCANO",
     "id": "e4b259b6dedb674283ab124117ce793360d3a1c0",
-    "resolution": "HD"
-  },
-  {
-    "category": "DEPORTES",
-    "name": "SKY SPORTS MAIN EVENT --> NEW LOOP",
-    "id": "78266c15035d0ad8cbc58f821733931e1de434ab",
     "resolution": "HD"
   },
   {
@@ -269,12 +226,6 @@
     "name": "TELEDEPORTE FHD --> NEW ERA",
     "id": "7d910d9480e023608d1fe77eaf47c2ed34592155",
     "resolution": "FHD"
-  },
-  {
-    "category": "DEPORTES",
-    "name": "TELEDEPORTE --> ELCANO",
-    "id": "b0d1489c9f3239349665ad5ab423363f2b02e5ae",
-    "resolution": "HD"
   },
   {
     "category": "DEPORTES",
@@ -303,12 +254,6 @@
   {
     "category": "EUROSPORT",
     "name": "EUROSPORT 1 --> ELCANO",
-    "id": "48a589dbeab3544662fafd79888aada7d834cfe9",
-    "resolution": "HD"
-  },
-  {
-    "category": "EUROSPORT",
-    "name": "EUROSPORT 1 --> ELCANO",
     "id": "0db68ab752b50e6bb257eef22d102c1d29cd92ea",
     "resolution": "HD"
   },
@@ -321,25 +266,7 @@
   {
     "category": "EUROSPORT",
     "name": "EUROSPORT 1 HD --> NEW LOOP",
-    "id": "40e91bfde34cc036571cb6999cdbd9870a4a7577",
-    "resolution": "HD"
-  },
-  {
-    "category": "EUROSPORT",
-    "name": "EUROSPORT 1 HD --> NEW LOOP",
-    "id": "4a67d5f9f7aba0f9735813f0034380cd48424671",
-    "resolution": "HD"
-  },
-  {
-    "category": "EUROSPORT",
-    "name": "EUROSPORT 1 HD --> NEW LOOP",
-    "id": "e541a954465df29ccce4d829529d983ffb2803d4",
-    "resolution": "HD"
-  },
-  {
-    "category": "EUROSPORT",
-    "name": "EUROSPORT 1 HD --> NEW LOOP",
-    "id": "37f5d22ee578b0cdbc715b8971175bdc91eebb5d",
+    "id": "5378c95e982e496a3dafbc4fda57ca37da669321",
     "resolution": "HD"
   },
   {
@@ -364,12 +291,6 @@
     "category": "EUROSPORT",
     "name": "EUROSPORT 2 --> ELCANO",
     "id": "f5908690485ae2facecf3074446ba4315f07a193",
-    "resolution": "HD"
-  },
-  {
-    "category": "EUROSPORT",
-    "name": "EUROSPORT 2 HD --> NEW LOOP",
-    "id": "088aea0c1509c5324f5ec6b9b6ff17ef2c231420",
     "resolution": "HD"
   },
   {
@@ -453,6 +374,12 @@
   {
     "category": "FORMULA 1",
     "name": "DAZN F1 --> ELCANO",
+    "id": "ed6188dcbb491efeb2092c1a6199226c27f61727",
+    "resolution": "HD"
+  },
+  {
+    "category": "FORMULA 1",
+    "name": "DAZN F1 --> ELCANO",
     "id": "88d7cdd80be237ae21314f7f1b6582991498e8ba",
     "resolution": "HD"
   },
@@ -471,7 +398,7 @@
   {
     "category": "FORMULA 1",
     "name": "DAZN F1 --> ELCANO",
-    "id": "fd53cfa7055fe458d4f5c0ff59a06cd43723be55",
+    "id": "b08e158ea3f5c72084f5ff8e3c30ca2e4d1ff6d1",
     "resolution": "HD"
   },
   {
@@ -482,14 +409,14 @@
   },
   {
     "category": "FORMULA 1",
-    "name": "DAZN F1 --> NEW LOOP",
-    "id": "fc1bb10b16292d2ac88306d9c75466278fcf16f2",
+    "name": "DAZN F1 --> ELCANO",
+    "id": "fd53cfa7055fe458d4f5c0ff59a06cd43723be55",
     "resolution": "HD"
   },
   {
     "category": "FORMULA 1",
     "name": "DAZN F1 HD --> NEW LOOP",
-    "id": "75f5611ddc9aecb23de4cded1fd199ebb9d7463f",
+    "id": "6d325cda6ed591647ef5e91edd043147bce8be30",
     "resolution": "HD"
   },
   {
@@ -506,12 +433,6 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "BEIN SPORTS 1 --> NEW LOOP",
-    "id": "58e454d067b9e25e40f3c62b3430b55ef6fead09",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "BEIN SPORTS 1 --> SPORT TV",
     "id": "bba1905fcd1c4975aec544047bf8e4cd23ce3fe0",
     "resolution": "HD"
@@ -524,50 +445,14 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "BEIN SPORTS 2 --> NEW LOOP",
-    "id": "fa0a5dd9ecc3febbda8b6e1805c539a93fe515ac",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "BEIN SPORTS 2 --> SPORT TV",
     "id": "edb507e38394d614c9ff55805c9d354ae13210bc",
     "resolution": "HD"
   },
   {
     "category": "FUTBOL INT",
-    "name": "BEIN SPORTS 3 --> NEW LOOP",
-    "id": "519c2159e9228bfe2f94911dfa111b01d0a896e2",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "BEIN SPORTS 3 --> SPORT TV",
     "id": "731bd3336ec0986ff9100efe40dbaf1473a22cf8",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "BEIN SPORTS Ñ --> NEW LOOP",
-    "id": "ac033bf7bf6eb4efa5ca3f8070742093eab47685",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "BEIN SPORTS Ñ --> NEW LOOP",
-    "id": "33aa6331066d7796fcab74bed23206f16bded398",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "BT Sport 1 [UK] --> NEW LOOP",
-    "id": "2605c201c8c9cf6684ee1de562d3b4c7e17ac915",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "BT Sport 1 [UK] --> NEW LOOP",
-    "id": "19c5c13a8e7273d78d53fdaea3deaf1b80e938fa",
     "resolution": "HD"
   },
   {
@@ -584,20 +469,8 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "BT Sport 2 [UK] --> NEW LOOP",
-    "id": "01dcc1ea3387c2b73953efe3f52286a770737d7c",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "BT Sport 2 [UK] --> SPORT TV",
     "id": "d63d8a57cf471394bfa9f619bbd68b01ae27a801",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "BT Sport 3 [UK] --> NEW LOOP",
-    "id": "d57ebd44296b0c92c0661cc964e737a54b852cec",
     "resolution": "HD"
   },
   {
@@ -610,12 +483,6 @@
     "category": "FUTBOL INT",
     "name": "ELEVEN DAZN 1 --> ELCANO",
     "id": "246d487d1087fbb9dc74c821b0d87ad306f16591",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 1 --> NEW LOOP",
-    "id": "969e14989a98c62518a7640741dbf15d90212d1a",
     "resolution": "HD"
   },
   {
@@ -638,12 +505,6 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 2 --> NEW LOOP",
-    "id": "27573fb01690fd55b25c07ae2180ee44b1ad8a7c",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ELEVEN DAZN 2 --> SPORT TV",
     "id": "d08013df6e437a1fdf1e0c34f573fdf6a40c7fce",
     "resolution": "HD"
@@ -652,12 +513,6 @@
     "category": "FUTBOL INT",
     "name": "ELEVEN DAZN 2 HD --> SPORT TV",
     "id": "54a4a28882d3cae1ca19de5d4b022ebea40351f9",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 3 --> NEW LOOP",
-    "id": "33246d7ad41db9ad7654f0d553b5e7500363d1b8",
     "resolution": "HD"
   },
   {
@@ -674,12 +529,6 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 4 --> NEW LOOP",
-    "id": "3c0cfbeb4075be58baa32e41dabee3c75b8a80e6",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ELEVEN DAZN 4 --> SPORT TV",
     "id": "0f32c0131a2d9444996410801f4e18b04384db98",
     "resolution": "HD"
@@ -692,20 +541,8 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 5 --> NEW LOOP",
-    "id": "2c9a996c060d157ff63109c5b999d55bbc2ffd95",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ELEVEN DAZN 5 --> SPORT TV",
     "id": "4dbe63b44fc4f439f5b634c0d2aa7e0cccad808a",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ELEVEN DAZN 6 --> NEW LOOP",
-    "id": "471f21a1eb3453e9b70e90228f016ad1142d581d",
     "resolution": "HD"
   },
   {
@@ -716,38 +553,14 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "ESPN2 [US] --> NEW LOOP",
-    "id": "437692bc0dedcf1c27c2ab2c1c7e58b0806244fe",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ESPN2 [US] --> SPORT TV",
     "id": "664eb5fe460b96941aed633959a845b185cd8394",
     "resolution": "HD"
   },
   {
     "category": "FUTBOL INT",
-    "name": "ESPN 2 [BE] --> NEW LOOP",
-    "id": "1114c803ee0f7dd7b5af5be42e49b5cdc64db2b5",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ESPN 2 [BE] --> SPORT TV",
     "id": "3e0ba6867173f345d482d80c771f1a5dc3b37e63",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ESPN 3 [BE] --> NEW LOOP",
-    "id": "7ae7a8ae390bbc5bdad5383aa10ebb201b0141dc",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ESPN 4 [BE] --> NEW LOOP",
-    "id": "d18e752ade97d8be74a99887fec550472335b99f",
     "resolution": "HD"
   },
   {
@@ -764,20 +577,8 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "ESPN [BE] --> NEW LOOP",
-    "id": "dda76be0877ee2b4e5619a88f878ca47978cc09d",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ESPN [BE] --> SPORT TV",
     "id": "79f10c6c6168e42bfc606f3f7b9e5f3ca79dedab",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ESPN HD [US] --> NEW LOOP",
-    "id": "0dca83a7cc9184893ff96ee2355874342fc8fd45",
     "resolution": "HD"
   },
   {
@@ -788,20 +589,8 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "PREMIER SPORTS 1 --> NEW LOOP",
-    "id": "13ddaf59c0f2d760fd3775acc254e13825206eac",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "PREMIER SPORTS 1 --> SPORT TV",
     "id": "75a56863b6fe0407ad4305b4d7ee5643c3923565",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "PREMIER SPORTS 2 --> NEW LOOP",
-    "id": "086e4c7ccc0b80e2960a553d04dac1024c7787b9",
     "resolution": "HD"
   },
   {
@@ -812,50 +601,14 @@
   },
   {
     "category": "FUTBOL INT",
-    "name": "SKY SPORTS FOOTBALL --> NEW LOOP",
-    "id": "54de746f7823812312b4000422618465f7d58f87",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "SKY SPORTS FOOTBALL --> SPORT TV",
     "id": "8dbe2d515e9131fa311353537736f8c94be9b26d",
     "resolution": "HD"
   },
   {
     "category": "FUTBOL INT",
-    "name": "ZIGGO SPORT --> NEW LOOP",
-    "id": "8e475c8b9f12270c524f88f5659cc6811fc1399c",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ZIGGO SPORT 2 --> NEW LOOP",
-    "id": "fca28f51d5500d131770230b033c5da2b36ebf9c",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
     "name": "ZIGGO SPORT 2 --> SPORT TV",
     "id": "868a6187d6aeec65ded84bd777814c9f7b7a9027",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ZIGGO SPORT 3 --> NEW LOOP",
-    "id": "3ff91ece4152cfb102f1b515eeecf044052592a4",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ZIGGO SPORT 4 --> NEW LOOP",
-    "id": "56fd40904b16813476c592e877f3b0168cd42781",
-    "resolution": "HD"
-  },
-  {
-    "category": "FUTBOL INT",
-    "name": "ZIGGO SPORT 6 --> NEW LOOP",
-    "id": "c81fe6504175b77b4345a3e8b740aba1e3bf60dc",
     "resolution": "HD"
   },
   {
@@ -899,12 +652,6 @@
     "category": "HYPERMOTION",
     "name": "HYPERMOTION --> ELCANO",
     "id": "87bb542f974b6b9e89d0f2e20ed6dc93426f4be0",
-    "resolution": "HD"
-  },
-  {
-    "category": "HYPERMOTION",
-    "name": "HYPERMOTION 2 --> ELCANO",
-    "id": "3a21e651c0bffe810cfc8537065cb81f5ed68a55",
     "resolution": "HD"
   },
   {
@@ -966,12 +713,6 @@
   {
     "category": "LA LIGA",
     "name": "DAZN LA LIGA 1 --> ELCANO",
-    "id": "e2b8a4aba2f4ea3dd68992fcdb65c9e62d910b05",
-    "resolution": "HD"
-  },
-  {
-    "category": "LA LIGA",
-    "name": "DAZN LA LIGA 1 --> ELCANO",
     "id": "4955867fad3bc92e5b4c36045699fc277800fb18",
     "resolution": "HD"
   },
@@ -979,18 +720,6 @@
     "category": "LA LIGA",
     "name": "DAZN LA LIGA 1 --> ELCANO",
     "id": "9c75f1d190c518cfe0f236415b8dccc1f676ef3b",
-    "resolution": "HD"
-  },
-  {
-    "category": "LA LIGA",
-    "name": "DAZN LA LIGA 1 --> NEW LOOP",
-    "id": "8a25653a2f774f4ae1062d38a30dcd714d304a3a",
-    "resolution": "HD"
-  },
-  {
-    "category": "LA LIGA",
-    "name": "DAZN LA LIGA 1 --> NEW LOOP",
-    "id": "c7158b32d513258252b49d21b5e200f31d30c017",
     "resolution": "HD"
   },
   {
@@ -1082,20 +811,14 @@
   {
     "category": "LA LIGA",
     "name": "M+ LALIGA --> ELCANO",
-    "id": "4b528d10eaad747ddf52251206177573ee3e9f74",
-    "resolution": "HD"
-  },
-  {
-    "category": "LA LIGA",
-    "name": "M+ LALIGA --> ELCANO",
     "id": "c9321006921967d6258df6945f1d598a5c0cbf1e",
     "resolution": "HD"
   },
   {
     "category": "LA LIGA",
-    "name": "M+ LALIGA FHD --> NEW LOOP",
-    "id": "0bd70b57127c5e466f8f997617ba0389b7446e4a",
-    "resolution": "FHD"
+    "name": "M+ LALIGA --> ELCANO",
+    "id": "4b528d10eaad747ddf52251206177573ee3e9f74",
+    "resolution": "HD"
   },
   {
     "category": "LA LIGA",
@@ -1108,12 +831,6 @@
     "name": "M+ LALIGA 2 FHD --> NEW ERA",
     "id": "caa631e8850e3eb5e7c039063dd8a339ccef1176",
     "resolution": "FHD"
-  },
-  {
-    "category": "LA LIGA",
-    "name": "M+ LALIGA 2 --> ELCANO",
-    "id": "ad42faa399df66dcd62a1cbc9d1c99ed4512d3b8",
-    "resolution": "HD"
   },
   {
     "category": "LA LIGA",
@@ -1203,25 +920,7 @@
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES --> ELCANO",
-    "id": "43249349740032bee068b5bbff7b078f642812db",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES --> ELCANO",
     "id": "91b2a1fe85f5bb4a6cf9ef6d01cc65883d986920",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES --> ELCANO",
-    "id": "2b51710cee513e8939785fa3e7980f32d4e0415f",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES --> ELCANO",
-    "id": "9db029dff6a9c637d1f670e78dbc1a479b9b406e",
     "resolution": "HD"
   },
   {
@@ -1229,12 +928,6 @@
     "name": "LIGA DE CAMPEONES --> ELCANO",
     "id": "97df5b7824948972d041d8ca2a4d29c90b641bc9",
     "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES FHD --> NEW LOOP",
-    "id": "d2b681aae903a3a278c25bae2d94d7609617766b",
-    "resolution": "FHD"
   },
   {
     "category": "LIGA DE CAMPEONES",
@@ -1275,20 +968,14 @@
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 2 --> ELCANO",
-    "id": "bb26037a253866d341778181eff5c8637240d615",
+    "id": "47188da7d2e4beaee82cff174f223fdd23f78fa6",
     "resolution": "HD"
   },
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 2 --> ELCANO",
-    "id": "74ab4e4ec7e2da001f473ca40893b7307b8029c5",
+    "id": "bb26037a253866d341778181eff5c8637240d615",
     "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 2 FHD --> NEW LOOP",
-    "id": "67048981e2718a1d5905fd9c04a707be71643fa2",
-    "resolution": "FHD"
   },
   {
     "category": "LIGA DE CAMPEONES",
@@ -1323,12 +1010,6 @@
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 3 --> ELCANO",
-    "id": "5b7f54b12e0f96ceba1299f44eac4b0f97403e4e",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 3 --> ELCANO",
     "id": "cfc371890bfb502737a26de5215e50929c52d0f9",
     "resolution": "HD"
   },
@@ -1337,18 +1018,6 @@
     "name": "LIGA DE CAMPEONES 3 --> ELCANO",
     "id": "320bee0fbdf2a168d47810236985a7c40b4f85c9",
     "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 3 --> ELCANO",
-    "id": "4416843c96b7f7a1bc55c476091a60fff0922bc7",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 3 FHD --> NEW LOOP",
-    "id": "68dfc2d81b9c0d13f643c5e5dc2e0e8e245ff6cc",
-    "resolution": "FHD"
   },
   {
     "category": "LIGA DE CAMPEONES",
@@ -1371,26 +1040,8 @@
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 4 --> ELCANO",
-    "id": "5ba9368d80d2f87ac1c6d71df4e7e6e26e6911f2",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 4 --> ELCANO",
     "id": "91ac4585368992720ec17ffa5b4389368c6dcac1",
     "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 4 --> ELCANO",
-    "id": "e9f4493d2d851f4636720f639113e05b4a21a74c",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 4 FHD --> NEW LOOP",
-    "id": "28a7a0e04e8e43d3cd99d67f31304feedef60baa",
-    "resolution": "FHD"
   },
   {
     "category": "LIGA DE CAMPEONES",
@@ -1403,12 +1054,6 @@
     "name": "LIGA DE CAMPEONES 5 FHD --> NEW ERA",
     "id": "cb6410a6355a645cfc6f6f5a7c7d71298fcbc2c5",
     "resolution": "FHD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 5 --> ELCANO",
-    "id": "5620c0ce3dcbf14a6375cb2c2d681207f45eb97d",
-    "resolution": "HD"
   },
   {
     "category": "LIGA DE CAMPEONES",
@@ -1431,24 +1076,6 @@
   {
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 6 --> ELCANO",
-    "id": "54e971e70ed1e79a073a3aae410aed7818799112",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 6 --> ELCANO",
-    "id": "497e2d0301fc289ccbd43080a580f63b718770e2",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 6 --> ELCANO",
-    "id": "a3e8b1eac4866685ed52eb448b0891d0cb0ed031",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 6 --> ELCANO",
     "id": "14bedc2ff054ae16c0fae99cfeb9dcda21ac68a0",
     "resolution": "HD"
   },
@@ -1456,12 +1083,6 @@
     "category": "LIGA DE CAMPEONES",
     "name": "LIGA DE CAMPEONES 7 --> ELCANO",
     "id": "f22268a7d4a279feee02243d93a65cca2825c8e1",
-    "resolution": "HD"
-  },
-  {
-    "category": "LIGA DE CAMPEONES",
-    "name": "LIGA DE CAMPEONES 7 --> ELCANO",
-    "id": "95ced66c1268717c19c1e3e020e3b23b0f02e504",
     "resolution": "HD"
   },
   {
@@ -1484,32 +1105,14 @@
   },
   {
     "category": "MOTOR",
-    "name": "CANAL MOTOR --> NEW LOOP",
-    "id": "22b250ce7a16dce785b2e1ee6d4e13bdfa7354cc",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOTOR",
     "name": "MOTORS TV HD --> NEW LOOP",
     "id": "442aeb6643b8836f9d00361c9e48eeb0841ddf98",
     "resolution": "HD"
   },
   {
     "category": "MOTOR",
-    "name": "MOTORS TV HD --> NEW LOOP",
-    "id": "a6044ffdb11c0349253f35386c23e994c28cf997",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOTOR",
     "name": "MOTORVISION --> NEW LOOP",
     "id": "9c75e6ed0671eec6670cb2eabcc7d78267c7f404",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOTOR",
-    "name": "MOTORVISION --> NEW LOOP",
-    "id": "3a9f3c8b5ff1ef9cbdff95e171b36ff9affe03cd",
     "resolution": "HD"
   },
   {
@@ -1527,25 +1130,19 @@
   {
     "category": "MOTOR",
     "name": "RALLY TV --> ELCANO",
-    "id": "12404b00d2787995d639ccf71a80da5d39d153f9",
+    "id": "b6ca8e022947548af61d76660b6b6f799a778d31",
     "resolution": "HD"
   },
   {
     "category": "MOTOR",
     "name": "RALLY TV --> ELCANO",
-    "id": "b6ca8e022947548af61d76660b6b6f799a778d31",
+    "id": "12404b00d2787995d639ccf71a80da5d39d153f9",
     "resolution": "HD"
   },
   {
     "category": "MOTOR",
     "name": "RETROVISION MOTOR --> NEW LOOP",
     "id": "b8b8c4470d3d27c75302cf49ab6c4b52a660bff3",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOTOR",
-    "name": "RETROVISION MOTOR --> NEW LOOP",
-    "id": "825a5b77c23a5f96df6fd096d5391f7de2653fcf",
     "resolution": "HD"
   },
   {
@@ -1593,8 +1190,15 @@
   {
     "category": "MOVISTAR",
     "name": "MOVISTAR PLUS FHD --> ELCANO",
-    "id": "ed74406ccdb3c21941b919db6bffca7f1de015bb",
+    "id": "d23497596720b47b096ec0f850d6d26a19d1a336",
     "resolution": "FHD"
+  },
+  {
+    "category": "MOVISTAR",
+    "name": "MOVISTAR PLUS FHD --> ELCANO",
+    "id": "ed74406ccdb3c21941b919db6bffca7f1de015bb",
+    "resolution": "FHD",
+    "recommended": true
   },
   {
     "category": "MOVISTAR",
@@ -1683,13 +1287,13 @@
   {
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR DEPORTES --> ELCANO",
-    "id": "77cf022557c56cdf8d8115f50e61f846ad72ee05",
+    "id": "3b50a1dca0977e3761d016edd79314ab797f74f6",
     "resolution": "HD"
   },
   {
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR DEPORTES --> ELCANO",
-    "id": "3b50a1dca0977e3761d016edd79314ab797f74f6",
+    "id": "77cf022557c56cdf8d8115f50e61f846ad72ee05",
     "resolution": "HD"
   },
   {
@@ -1703,12 +1307,6 @@
     "name": "MOVISTAR DEPORTES 2 FHD --> NEW ERA",
     "id": "6e212a916c83638268047dd2757c95b14f7d25a3",
     "resolution": "FHD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 2 --> ELCANO",
-    "id": "6b15368775693c33c49fab02e7900c1976a5da90",
-    "resolution": "HD"
   },
   {
     "category": "MOVISTAR DEPORTES",
@@ -1743,19 +1341,7 @@
   {
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR DEPORTES 3 --> ELCANO",
-    "id": "e9ce6e62ff97f1da7f10fd449a3c8e8ee90b253d",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 3 --> ELCANO",
     "id": "2fd410c5d89e7a627cd3785685b7915b8e4bd534",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 3 --> ELCANO",
-    "id": "f4d9011721fad5098febbe4d7c078a582e176a01",
     "resolution": "HD"
   },
   {
@@ -1786,18 +1372,6 @@
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR DEPORTES 4 --> ELCANO",
     "id": "2a5d90651e212106434edea5bfbba1a843b7b97c",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 4 --> ELCANO",
-    "id": "4abe06c5cce7cb3c6bef2c3bccaafefd3299794f",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 4 --> ELCANO",
-    "id": "590a1f4546e3a0d5d419b62b8177b44d6ce0339f",
     "resolution": "HD"
   },
   {
@@ -1846,12 +1420,6 @@
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR DEPORTES 6 HD --> SPORT TV",
     "id": "8f982a0d6e3196c12d0034142b65008321150f7c",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR DEPORTES 7 --> ELCANO",
-    "id": "2d549bbcd898b09c4b736e6e3e83e8e8c19fcbda",
     "resolution": "HD"
   },
   {
@@ -1930,12 +1498,6 @@
     "category": "MOVISTAR DEPORTES",
     "name": "MOVISTAR VAMOS --> ELCANO",
     "id": "476b6f6583517bd75c15c4663bf45fab7c8da9cf",
-    "resolution": "HD"
-  },
-  {
-    "category": "MOVISTAR DEPORTES",
-    "name": "MOVISTAR VAMOS --> ELCANO",
-    "id": "f51674b1dd1ab5a668fa97a0f13a490632f0d7ca",
     "resolution": "HD"
   },
   {
@@ -2295,12 +1857,6 @@
   {
     "category": "TDT",
     "name": "LA 1 --> ELCANO",
-    "id": "1fddc49dd11ae7bb16f2b94648a9b4f0efc80349",
-    "resolution": "HD"
-  },
-  {
-    "category": "TDT",
-    "name": "LA 1 --> ELCANO",
     "id": "f379d93b71731f1bbd0845d1b1e4dc37b5b1fd92",
     "resolution": "HD"
   },
@@ -2338,18 +1894,6 @@
     "category": "TENNIS",
     "name": "TENNIS CHANNEL --> NEW LOOP",
     "id": "8091334c82e8720fc6aa05ff0bd6d343c5bfecbf",
-    "resolution": "HD"
-  },
-  {
-    "category": "TENNIS",
-    "name": "TENNIS CHANNEL --> NEW LOOP",
-    "id": "8941762ddb41ff774d02431b7973f759d7c74157",
-    "resolution": "HD"
-  },
-  {
-    "category": "TENNIS",
-    "name": "TENNIS CHANNEL HD --> NEW LOOP",
-    "id": "1b348443efc7f0cf4cdf349ac35bbe5d41be6220",
     "resolution": "HD"
   },
   {
@@ -2408,18 +1952,6 @@
   },
   {
     "category": "OTROS",
-    "name": "Auto Motor und Sport Channel --> NEW LOOP",
-    "id": "a211931dace9e4d8975a036b60836fac753e33de",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "BeIN Sport 1 HD --> NEW LOOP",
-    "id": "069ac307d62d69bc28aabf1fa5a2e93cac34194b",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
     "name": "Bein Sports TR FHDp * --> ELCANO",
     "id": "e7ddca738693a902ce34fb80788b220676c15801",
     "resolution": "HD"
@@ -2429,24 +1961,6 @@
     "name": "CALCIO EVENTOS FHD --> NEW ERA",
     "id": "1e045b7e16a5c2c3e5a8c0c0176efa26b63d7955",
     "resolution": "FHD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Canal+ action --> NEW LOOP",
-    "id": "5268a2b348aa53e325f99054a9da7cf1a2179ec9",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "CANAL+ SPORT --> NEW LOOP",
-    "id": "108b33a44b6ab295f6301d0a2c433a1ef330d5a4",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Canal+ Sport 3 PL --> NEW LOOP",
-    "id": "b3f2b59e44fe70f45dca643107f88b6fcff80672",
-    "resolution": "HD"
   },
   {
     "category": "OTROS",
@@ -2468,48 +1982,6 @@
   },
   {
     "category": "OTROS",
-    "name": "Dazn MotoGP SDp * --> ELCANO",
-    "id": "ac33342ccf7d40d46174229085461d95000b9137",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Dazn MotoGP FHDp ** --> ELCANO",
-    "id": "342ca6975a4884d81f9fec5c4085a47060bd2028",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Dazn MotoGP FHDp ** --> ELCANO",
-    "id": "c53bdb3be55d12c5188d25085f1bb16911c15cea",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Dazn MotoGP SDp ** --> ELCANO",
-    "id": "129c707eb4854171d178a566f36d90b7f2b5e624",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Esport3 FHDp * --> ELCANO",
-    "id": "21bc11d195f5753c396e390c215952d21541d04d",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Esport3 SDp * --> ELCANO",
-    "id": "ff03650163b9456d59ed5f262aa3ab2e19831e6d",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Esport3 SDp * --> ELCANO",
-    "id": "739792a3225e5eb3056f4faa7b1137c7f161f23c",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
     "name": "Esport3 FHDp ** --> ELCANO",
     "id": "8f59ce96e4c902ba2f5193af07546d7ff17fc3bc",
     "resolution": "HD"
@@ -2518,12 +1990,6 @@
     "category": "OTROS",
     "name": "Esport3 SDp ** --> ELCANO",
     "id": "ed6524f8f73c30cf102fde66f2cb520f4b5842e3",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Film+ HD --> NEW LOOP",
-    "id": "ec7aeef5723f654ee705a192bdcf4eff2fc7c311",
     "resolution": "HD"
   },
   {
@@ -2540,14 +2006,8 @@
   },
   {
     "category": "OTROS",
-    "name": "M+ Golf 2 FHDp ** --> ELCANO",
-    "id": "882074140fca664e119a43294afa2fb4a64917ef",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "M+ Golf FHDp * --> ELCANO",
-    "id": "9bb2a7dc6c6a296609df8cc50e742a78194f7530",
+    "name": "M+ Golf 2 * --> ELCANO",
+    "id": "ac321484243571f59e077f2a2521e648dc0c7b03",
     "resolution": "HD"
   },
   {
@@ -2630,44 +2090,14 @@
   },
   {
     "category": "OTROS",
-    "name": "NBA DAZN SDp * --> ELCANO",
-    "id": "3bc122425f49648689cb8fd81de33cb19b848d20",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "noa4 Hamburg FHD --> NEW LOOP",
-    "id": "d6914c08d198edcfbac7562e3db75303bd8fde48",
-    "resolution": "FHD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Orange TV --> NEW LOOP",
-    "id": "cfb04bd3d4ca8d661eee02ed734ac767d04a00f6",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
     "name": "Pluto TV Auto Motor Sport (720p) --> NEW LOOP",
     "id": "ffa09e597804001f634dd1829f031823411a2595",
     "resolution": "HD"
   },
   {
     "category": "OTROS",
-    "name": "Pluto TV Auto Motor Sport (720p) --> NEW LOOP",
-    "id": "93780e4164ed775a9a7cd67c44716de58463fa0a",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
     "name": "RFEF TV FHDp * --> ELCANO",
     "id": "7b742628b9f7e82902bdbc1ff92eba1988875cfc",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "RFEF TV FHDp * --> ELCANO",
-    "id": "177796041773be99b489dd3ce86144f243e7355f",
     "resolution": "HD"
   },
   {
@@ -2770,18 +2200,6 @@
     "category": "OTROS",
     "name": "SKY Sports LaLiga FHDp ** --> ELCANO",
     "id": "e9975d38aaa4475ac0b1fa0faa541bbadd85a662",
-    "resolution": "HD"
-  },
-  {
-    "category": "OTROS",
-    "name": "Star Cinema FHD UA --> NEW LOOP",
-    "id": "8499569a8a8977d6dfea59cd83e78d594ae8b06f",
-    "resolution": "FHD"
-  },
-  {
-    "category": "OTROS",
-    "name": "SuperTennis HD --> NEW LOOP",
-    "id": "7a57543cb6061648dc44c5d4321bd100bc8a47ca",
     "resolution": "HD"
   },
   {

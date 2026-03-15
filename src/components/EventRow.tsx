@@ -1,16 +1,21 @@
-import { Tv, Clock } from 'lucide-react';
-import { CHANNEL_ICONS, type ChannelEntry, type Team, type Event } from '@/lib/channels';
+import { Tv, Clock, User } from 'lucide-react';
+import { CHANNEL_ICONS, SPORT_BADGE_CONFIG, type BadgeStyle, type ChannelEntry, type Team, type Event } from '@/lib/channels';
 
-function TeamBadge({ team, reverse }: { team: Team; reverse?: boolean }) {
+function TeamBadge({ team, reverse, badgeStyle }: { team: Team; reverse?: boolean; badgeStyle: BadgeStyle }) {
+  const isHeadshot = badgeStyle === 'headshot';
   return (
     <div className={`flex items-center gap-2 min-w-0 ${reverse ? 'flex-row-reverse text-right' : ''}`}>
       {team.badge ? (
         <img
           src={team.badge}
           alt={team.name}
-          className="size-7 shrink-0 object-contain"
+          className={`shrink-0 object-contain ${isHeadshot ? 'size-11 relative -top-2' : 'size-7'}`}
           loading="lazy"
         />
+      ) : isHeadshot ? (
+        <div className="size-11 shrink-0 rounded-full bg-muted flex items-center justify-center relative -top-2">
+          <User className="size-6 text-muted-foreground" />
+        </div>
       ) : (
         <div className="size-7 shrink-0 rounded-full bg-muted" />
       )}
@@ -50,9 +55,9 @@ export function EventRow({ event, onChannelSelect }: { event: Event; onChannelSe
         <span className="text-sm font-semibold text-foreground">{event.time}</span>
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        <TeamBadge team={event.homeTeam} reverse />
+        <TeamBadge team={event.homeTeam} reverse badgeStyle={SPORT_BADGE_CONFIG[event.sport].badgeStyle} />
         <span className="text-xxs font-bold text-foreground">VS</span>
-        <TeamBadge team={event.awayTeam} />
+        <TeamBadge team={event.awayTeam} badgeStyle={SPORT_BADGE_CONFIG[event.sport].badgeStyle} />
       </div>
 
       {event.channels.length > 0 && (

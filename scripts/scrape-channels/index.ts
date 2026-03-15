@@ -16,6 +16,9 @@ const RECOMMENDED_STREAMS = new Set<string>([
   'eb4975702ceadca7ed74f8707e17a9f55569dbb9',
   'a5b9d834ad92bfb80fe01bf89cc20bd68be199fb',
   'ed74406ccdb3c21941b919db6bffca7f1de015bb',
+  '866a8af8faacf8fc9eb997ab5a68b4dfee4edc77',
+  'bfa01c11c5c6b7a616a516de4f2c769a89d26b25',
+  '3774d8feab016ca766b35ea8488e7514ca30e0ee',
 ]);
 
 // Override resolution for specific streams.
@@ -23,6 +26,8 @@ const RESOLUTION_OVERRIDES: Record<string, 'HD' | 'FHD'> = {
   '0febfb5cac3384f487d55c559bbfc877db2d0357': 'FHD',
   '4636ed75106cb00e9c70cc2029edf0a4df7ad73f': 'FHD',
   '51b363b1c4d42724e05240ad068ad219df8042ec': 'FHD',
+  '476b6f6583517bd75c15c4663bf45fab7c8da9cf': 'FHD',
+  'bfa01c11c5c6b7a616a516de4f2c769a89d26b25': 'FHD',
 };
 
 async function main() {

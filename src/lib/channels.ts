@@ -4,6 +4,7 @@ import { z } from 'zod';
 export enum Sport {
   FOOTBALL = 'football',
   TENNIS = 'tennis',
+  BASKETBALL = 'basketball',
 }
 
 /** Canonical competition identifiers. */
@@ -37,6 +38,14 @@ export enum Competition {
   // Tennis – Other
   LAVER_CUP = 'Laver Cup',
   BJK_CUP = 'Billie Jean King Cup',
+  // Basketball
+  LIGA_ENDESA = 'Liga Endesa',
+  EUROLEAGUE = 'EuroLeague',
+  NBA = 'NBA',
+  BASKETBALL_CHAMPIONS_LEAGUE = 'Basketball Champions League',
+  PRIMERA_FEB = 'Primera FEB',
+  LIGA_FEMENINA_BALONCESTO = 'Liga Femenina',
+  FIBA_EUROPE_CUP = 'FIBA Europe Cup',
 }
 
 /** Canonical channel identifiers. Single source of truth for channel names across the codebase. */
@@ -50,16 +59,16 @@ export enum Channel {
   DAZN_LALIGA_2 = 'DAZN LaLiga 2',
   DAZN_1_BAR = 'DAZN 1 Bar',
   DAZN_2_BAR = 'DAZN 2 Bar',
-  M_LALIGA = 'M+ LaLiga',
+  M_LALIGA = 'M+ LaLiga 1',
   M_LALIGA_2 = 'M+ LaLiga 2',
-  M_LIGA_DE_CAMPEONES = 'M+ Liga de Campeones',
+  M_LIGA_DE_CAMPEONES = 'M+ Liga de Campeones 1',
   M_LIGA_DE_CAMPEONES_2 = 'M+ Liga de Campeones 2',
   M_LIGA_DE_CAMPEONES_3 = 'M+ Liga de Campeones 3',
   M_LIGA_DE_CAMPEONES_4 = 'M+ Liga de Campeones 4',
   M_DEPORTES = 'M+ Deportes',
   M_DEPORTES_2 = 'M+ Deportes 2',
   MOVISTAR_PLUS = 'Movistar Plus',
-  VAMOS = 'Vamos',
+  VAMOS = 'M+ #Vamos',
   GOL_PLAY = 'Gol Play',
   EUROSPORT_1 = 'Eurosport 1',
   EUROSPORT_2 = 'Eurosport 2',
@@ -77,6 +86,35 @@ export enum Channel {
   HYPERMOTION_3 = 'Hypermotion 3',
   M_DEPORTES_3 = 'M+ Deportes 3',
   VAMOS_BAR = 'M+ #Vamos Bar',
+  DAZN_BALONCESTO = 'DAZN Baloncesto',
+  // UK channels
+  SKY_SPORTS_MAIN_EVENT = 'Sky Sports Main Event',
+  SKY_SPORTS_FOOTBALL = 'Sky Sports Football',
+  SKY_SPORTS_PREMIER_LEAGUE = 'Sky Sports Premier League',
+  SKY_SPORTS_ACTION = 'Sky Sports Action',
+  SKY_SPORTS_TENNIS = 'Sky Sports Tennis',
+  SKY_SPORTS_GOLF = 'Sky Sports Golf',
+  SKY_SPORTS_F1 = 'Sky Sports F1',
+  SKY_SPORTS_CRICKET = 'Sky Sports Cricket',
+  SKY_SPORTS_MIX = 'Sky Sports Mix',
+  SKY_SPORTS_ARENA = 'Sky Sports Arena',
+  TNT_SPORTS_1 = 'TNT Sports 1',
+  TNT_SPORTS_2 = 'TNT Sports 2',
+  TNT_SPORTS_3 = 'TNT Sports 3',
+  TNT_SPORTS_4 = 'TNT Sports 4',
+  PREMIER_SPORTS_1 = 'Premier Sports 1',
+  PREMIER_SPORTS_2 = 'Premier Sports 2',
+  BBC_ONE = 'BBC One',
+  ITV_1 = 'ITV 1',
+  ITV_4 = 'ITV 4',
+  // International channels
+  BEIN_SPORTS_1 = 'beIN Sports 1',
+  BEIN_SPORTS_2 = 'beIN Sports 2',
+  BEIN_SPORTS_3 = 'beIN Sports 3',
+  ESPN = 'ESPN',
+  ESPN_2 = 'ESPN 2',
+  FOX_SPORTS_1 = 'FOX Sports 1',
+  FOX_SPORTS_2 = 'FOX Sports 2',
 }
 
 // --- Zod schemas ---
@@ -159,6 +197,35 @@ export const CHANNEL_ICONS: Record<Channel, string> = {
   [Channel.HYPERMOTION_3]: '/icons/channels/laligatvbar.svg',
   [Channel.M_DEPORTES_3]: '/icons/channels/mdeportes.svg',
   [Channel.VAMOS_BAR]: '/icons/channels/vamos.svg',
+  [Channel.DAZN_BALONCESTO]: '/icons/channels/dazn.svg',
+  // UK channels
+  [Channel.SKY_SPORTS_MAIN_EVENT]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_FOOTBALL]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_PREMIER_LEAGUE]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_ACTION]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_TENNIS]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_GOLF]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_F1]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_CRICKET]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_MIX]: '/icons/channels/sky-sports.svg',
+  [Channel.SKY_SPORTS_ARENA]: '/icons/channels/sky-sports.svg',
+  [Channel.TNT_SPORTS_1]: '/icons/channels/tnt-sports.svg',
+  [Channel.TNT_SPORTS_2]: '/icons/channels/tnt-sports.svg',
+  [Channel.TNT_SPORTS_3]: '/icons/channels/tnt-sports.svg',
+  [Channel.TNT_SPORTS_4]: '/icons/channels/tnt-sports.svg',
+  [Channel.PREMIER_SPORTS_1]: '/icons/channels/premier-sports.svg',
+  [Channel.PREMIER_SPORTS_2]: '/icons/channels/premier-sports.svg',
+  [Channel.BBC_ONE]: '/icons/channels/bbc.svg',
+  [Channel.ITV_1]: '/icons/channels/itv.svg',
+  [Channel.ITV_4]: '/icons/channels/itv.svg',
+  // International channels
+  [Channel.BEIN_SPORTS_1]: '/icons/channels/bein-sports.svg',
+  [Channel.BEIN_SPORTS_2]: '/icons/channels/bein-sports.svg',
+  [Channel.BEIN_SPORTS_3]: '/icons/channels/bein-sports.svg',
+  [Channel.ESPN]: '/icons/channels/espn.svg',
+  [Channel.ESPN_2]: '/icons/channels/espn.svg',
+  [Channel.FOX_SPORTS_1]: '/icons/channels/fox-sports.svg',
+  [Channel.FOX_SPORTS_2]: '/icons/channels/fox-sports.svg',
 };
 
 /** Maps canonical competition names → brand colors */
@@ -179,7 +246,7 @@ export const COMPETITION_COLORS: Record<Competition, string> = {
   // Tennis
   [Competition.ROLAND_GARROS]: '#d35400',
   [Competition.WIMBLEDON]: '#006633',
-  [Competition.ATP_MASTERS_1000]: '#0c2340',
+  [Competition.ATP_MASTERS_1000]: '#c9a84c',
   [Competition.ATP_500]: '#0c2340',
   [Competition.ATP_250]: '#0c2340',
   [Competition.ATP_FINALS]: '#e4002b',
@@ -188,6 +255,22 @@ export const COMPETITION_COLORS: Record<Competition, string> = {
   [Competition.WTA_250]: '#6a1b9a',
   [Competition.LAVER_CUP]: '#1a1a1a',
   [Competition.BJK_CUP]: '#00a651',
+  // Basketball
+  [Competition.LIGA_ENDESA]: '#ff6600',
+  [Competition.EUROLEAGUE]: '#f47321',
+  [Competition.NBA]: '#1d428a',
+  [Competition.BASKETBALL_CHAMPIONS_LEAGUE]: '#ff8200',
+  [Competition.PRIMERA_FEB]: '#003da5',
+  [Competition.LIGA_FEMENINA_BALONCESTO]: '#e91e63',
+  [Competition.FIBA_EUROPE_CUP]: '#003da5',
+};
+
+export type BadgeStyle = 'logo' | 'headshot';
+
+export const SPORT_BADGE_CONFIG: Record<Sport, { badgeStyle: BadgeStyle }> = {
+  [Sport.FOOTBALL]: { badgeStyle: 'logo' },
+  [Sport.TENNIS]:   { badgeStyle: 'headshot' },
+  [Sport.BASKETBALL]: { badgeStyle: 'logo' },
 };
 
 /** Maps canonical competition names → icon paths (relative to public/) */
@@ -208,7 +291,7 @@ export const COMPETITION_ICONS: Record<Competition, string> = {
   // Tennis
   [Competition.ROLAND_GARROS]: '/icons/competitions/roland-garros.svg',
   [Competition.WIMBLEDON]: '/icons/competitions/wimbledon.svg',
-  [Competition.ATP_MASTERS_1000]: '/icons/competitions/atp.svg',
+  [Competition.ATP_MASTERS_1000]: '/icons/competitions/atp-masters-1000.svg',
   [Competition.ATP_500]: '/icons/competitions/atp.svg',
   [Competition.ATP_250]: '/icons/competitions/atp.svg',
   [Competition.ATP_FINALS]: '/icons/competitions/atp.svg',
@@ -217,4 +300,23 @@ export const COMPETITION_ICONS: Record<Competition, string> = {
   [Competition.WTA_250]: '/icons/competitions/wta.svg',
   [Competition.LAVER_CUP]: '/icons/competitions/laver-cup.svg',
   [Competition.BJK_CUP]: '/icons/competitions/bjk-cup.svg',
+  // Basketball
+  [Competition.LIGA_ENDESA]: '/icons/competitions/liga-endesa.svg',
+  [Competition.EUROLEAGUE]: '/icons/competitions/euroleague.svg',
+  [Competition.NBA]: '/icons/competitions/nba.svg',
+  [Competition.BASKETBALL_CHAMPIONS_LEAGUE]: '/icons/competitions/basketball-champions-league.svg',
+  [Competition.PRIMERA_FEB]: '/icons/competitions/primera-feb.svg',
+  [Competition.LIGA_FEMENINA_BALONCESTO]: '/icons/competitions/liga-femenina-baloncesto.svg',
+  [Competition.FIBA_EUROPE_CUP]: '/icons/competitions/fiba-europe-cup.svg',
+};
+
+/** Optional width override (Tailwind class) for wide/horizontal logos. Default is `size-12`. */
+export const COMPETITION_ICON_SIZE: Partial<Record<Competition, string>> = {
+  [Competition.BUNDESLIGA]: 'w-24',
+  [Competition.WTA_1000]: 'w-24',
+  [Competition.WTA_500]: 'w-24',
+  [Competition.WTA_250]: 'w-24',
+  [Competition.BJK_CUP]: 'w-24',
+  [Competition.EUROLEAGUE]: 'w-24',
+  [Competition.NBA]: 'w-24',
 };

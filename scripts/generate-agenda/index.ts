@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { Channel, Competition, Sport, agendaSchema, type Stream } from '../../src/lib/channels';
 import type { ScrapedChannel } from '../scrape-channels/types';
 import type { RawEvent, EspnEntry } from './types';
+import { scrapeWheresthematch, WTM_BROADCAST_MAP } from './wheresthematch';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = resolve(__dirname, '../../data/agenda.json');
@@ -56,6 +57,8 @@ const BROADCAST_MAP: Record<string, Channel> = {
   // Hypermotion
   'laliga tv hypermotion (m56 o120): ver partido': Channel.HYPERMOTION,
   'laliga tv hypermotion 2 (m59 o121): ver partido': Channel.HYPERMOTION_2,
+  // Basketball-specific broadcast names
+  'dazn baloncesto (m73 o126)': Channel.DAZN_BALONCESTO,
   // Tennis-specific broadcast names
   'm+ #vamos bar (304)': Channel.VAMOS_BAR,
   'm+ deportes 2 (64)': Channel.M_DEPORTES_2,
@@ -69,6 +72,7 @@ const BROADCAST_MAP: Record<string, Channel> = {
 // Each entry: [regex, channelName]. Order matters — more specific patterns first.
 // Tested against each acestream stream name to classify it.
 const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
+  [/\bDAZN\s+Baloncesto\b/i, Channel.DAZN_BALONCESTO],
   [/\bDAZN F1\b/i, Channel.DAZN_F1],
   [/\bDAZN\s+2\s+BAR\b/i, Channel.DAZN_2_BAR],
   [/\bDAZN\s+\d+\s+BAR\b/i, Channel.DAZN_1_BAR],
@@ -124,6 +128,36 @@ const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
   [/\bHYPERMOTION\s+3\b/i, Channel.HYPERMOTION_3],
   [/\bHYPERMOTION\s+2\b/i, Channel.HYPERMOTION_2],
   [/\bHYPERMOTION\b/i, Channel.HYPERMOTION],
+  // UK channels
+  [/\bSky\s*Sports?\s*Main\s*Event\b/i, Channel.SKY_SPORTS_MAIN_EVENT],
+  [/\bSky\s*Sports?\s*Football\b/i, Channel.SKY_SPORTS_FOOTBALL],
+  [/\bSky\s*Sports?\s*Premier\s*League\b/i, Channel.SKY_SPORTS_PREMIER_LEAGUE],
+  [/\bSkySP\s*PL\b/i, Channel.SKY_SPORTS_PREMIER_LEAGUE],
+  [/\bSky\s*Sports?\s*Action\b/i, Channel.SKY_SPORTS_ACTION],
+  [/\bSky\s*Sports?\s*Tennis\b/i, Channel.SKY_SPORTS_TENNIS],
+  [/\bSky\s*Sports?\s*Golf\b/i, Channel.SKY_SPORTS_GOLF],
+  [/\bSky\s*Sports?\s*F1\b/i, Channel.SKY_SPORTS_F1],
+  [/\bSky\s*Sports?\s*Cricket\b/i, Channel.SKY_SPORTS_CRICKET],
+  [/\bSky\s*Sports?\s*Mix\b/i, Channel.SKY_SPORTS_MIX],
+  [/\bSky\s*Sports?\s*Arena\b/i, Channel.SKY_SPORTS_ARENA],
+  [/\bTNT\s*Sports\s+1\b/i, Channel.TNT_SPORTS_1],
+  [/\bTNT\s*Sports\s+2\b/i, Channel.TNT_SPORTS_2],
+  [/\bTNT\s*Sports\s+3\b/i, Channel.TNT_SPORTS_3],
+  [/\bTNT\s*Sports\s+4\b/i, Channel.TNT_SPORTS_4],
+  [/\bTNT\s+Sports\b/i, Channel.TNT_SPORTS_1],
+  [/\bBT\s*Sport\s+1\b/i, Channel.TNT_SPORTS_1],
+  [/\bBT\s*Sport\s+2\b/i, Channel.TNT_SPORTS_2],
+  [/\bBT\s*Sport\s+3\b/i, Channel.TNT_SPORTS_3],
+  [/\bPremier\s*Sports?\s+1\b/i, Channel.PREMIER_SPORTS_1],
+  [/\bPremier\s*Sports?\s+2\b/i, Channel.PREMIER_SPORTS_2],
+  // International channels
+  [/\bbeIN\s*Sports?\s+1\b/i, Channel.BEIN_SPORTS_1],
+  [/\bbeIN\s*Sports?\s+2\b/i, Channel.BEIN_SPORTS_2],
+  [/\bbeIN\s*Sports?\s+3\b/i, Channel.BEIN_SPORTS_3],
+  [/\bESPN\s*2\b/i, Channel.ESPN_2],
+  [/\bESPN\b/i, Channel.ESPN],
+  [/\bFox\s*Sports?\s+2\b/i, Channel.FOX_SPORTS_2],
+  [/\bFox\s*Sports?\s+1\b/i, Channel.FOX_SPORTS_1],
 ];
 
 // Channels to exclude from output (ticket sales, free apps, non-streamable, etc.)
@@ -138,6 +172,8 @@ const EXCLUDE_CHANNELS = new Set([
   'hbo max', 'movistar+ lite',
   'tennis channel - orange tv (131)',
   'canal por confirmar',
+  // Basketball
+  'nba league pass', 'courtside 1891',
 ]);
 
 // Competition config: maps futbolenlatv slug → canonical name + ESPN league code.
@@ -224,8 +260,29 @@ const TENNIS_COMPETITION_CONFIG: Record<string, { name: Competition }> = {
   'fed-cup-finals': { name: Competition.BJK_CUP },
 };
 
+// Basketball competition config: maps futbolenlatv basketball slug → canonical name + ESPN league code.
+const BASKETBALL_COMPETITION_CONFIG: Record<string, { name: Competition; espn?: string }> = {
+  'liga-endesa': { name: Competition.LIGA_ENDESA },
+  'euroliga': { name: Competition.EUROLEAGUE },
+  'nba': { name: Competition.NBA, espn: 'nba' },
+  'basketball-champions-league': { name: Competition.BASKETBALL_CHAMPIONS_LEAGUE },
+  'liga-leb-oro': { name: Competition.PRIMERA_FEB },
+  'liga-femenina-baloncesto': { name: Competition.LIGA_FEMENINA_BALONCESTO },
+  'fiba-europe-cup': { name: Competition.FIBA_EUROPE_CUP },
+};
+
+// Reverse map: Competition → ESPN league code (for badge lookups from any source)
+const COMPETITION_ESPN_CODES: Partial<Record<Competition, string>> = {};
+for (const cfg of Object.values(COMPETITION_CONFIG)) {
+  if (cfg.espn) COMPETITION_ESPN_CODES[cfg.name] = cfg.espn;
+}
+for (const cfg of Object.values(BASKETBALL_COMPETITION_CONFIG)) {
+  if (cfg.espn) COMPETITION_ESPN_CODES[cfg.name] = cfg.espn;
+}
+
 const INCLUDE_COMPETITIONS = new Set(Object.keys(COMPETITION_CONFIG));
 const INCLUDE_TENNIS_COMPETITIONS = new Set(Object.keys(TENNIS_COMPETITION_CONFIG));
+const INCLUDE_BASKETBALL_COMPETITIONS = new Set(Object.keys(BASKETBALL_COMPETITION_CONFIG));
 
 // Decode HTML entities (&#225; → á, &#233; → é, etc.)
 function decodeEntities(str: string) {
@@ -306,6 +363,142 @@ function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today', sport: S
   return events;
 }
 
+function parseTennisEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
+  const events: RawEvent[] = [];
+  const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let isTargetDay = false;
+  let match;
+
+  const dayPattern = day === 'today' ? /hoy/i : /ma[ñn]ana/i;
+
+  while ((match = rowRe.exec(html)) !== null) {
+    const rowHTML = match[0];
+    const inner = match[1];
+
+    // Check for header rows (date separators)
+    if (/cabeceraTabla/.test(rowHTML)) {
+      isTargetDay = dayPattern.test(decodeEntities(inner));
+      continue;
+    }
+
+    if (!isTargetDay) continue;
+
+    // Extract time
+    const timeMatch = inner.match(/<td\s+class="hora[^"]*">\s*([\d:]+)\s*<\/td>/);
+    if (!timeMatch) continue;
+    const time = timeMatch[1];
+
+    // Extract competition slug from anchor href
+    const compMatch = inner.match(/<a\s+class="internalLink"\s+href="\/deporte\/tenis\/competicion\/([^"]+)"/);
+    const compSlug = compMatch ? compMatch[1] : '';
+
+    if (!INCLUDE_TENNIS_COMPETITIONS.has(compSlug)) continue;
+
+    const competition = TENNIS_COMPETITION_CONFIG[compSlug].name;
+
+    // Skip round-only events (no individual players listed)
+    if (/eventoUnaColumna/.test(inner)) continue;
+
+    // Extract players (reuse local/visitante structure)
+    const localMatch = inner.match(/<td\s+class="local">([\s\S]*?)<\/td>/);
+    const visitanteMatch = inner.match(/<td\s+class="visitante">([\s\S]*?)<\/td>/);
+    const homeTeam = extractPlayer(localMatch?.[1] || '');
+    const awayTeam = extractPlayer(visitanteMatch?.[1] || '');
+
+    // Extract channels
+    const canalesMatch = inner.match(/<ul\s+class="listaCanales">([\s\S]*?)<\/ul>/);
+    const channels: string[] = [];
+    if (canalesMatch) {
+      const liRe = /<li[^>]*title="([^"]*)"[^>]*>/g;
+      let liMatch;
+      while ((liMatch = liRe.exec(canalesMatch[1])) !== null) {
+        const rawName = decodeEntities(liMatch[1]);
+        if (rawName && !EXCLUDE_CHANNELS.has(rawName.toLowerCase())) {
+          channels.push(rawName);
+        }
+      }
+    }
+
+    if (homeTeam.name && awayTeam.name) {
+      events.push({ time, sport: Sport.TENNIS, competition, compSlug, homeTeam, awayTeam, channels });
+    }
+  }
+
+  return events;
+}
+
+function parseBasketballEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
+  const events: RawEvent[] = [];
+  const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let isTargetDay = false;
+  let match;
+
+  const dayPattern = day === 'today' ? /hoy/i : /ma[ñn]ana/i;
+
+  while ((match = rowRe.exec(html)) !== null) {
+    const rowHTML = match[0];
+    const inner = match[1];
+
+    // Check for header rows (date separators)
+    if (/cabeceraTabla/.test(rowHTML)) {
+      isTargetDay = dayPattern.test(decodeEntities(inner));
+      continue;
+    }
+
+    if (!isTargetDay) continue;
+
+    // Extract time
+    const timeMatch = inner.match(/<td\s+class="hora[^"]*">\s*([\d:]+)\s*<\/td>/);
+    if (!timeMatch) continue;
+    const time = timeMatch[1];
+
+    // Extract competition slug from anchor href (sport subpage format)
+    const compMatch = inner.match(/<a\s+class="internalLink"\s+href="\/deporte\/baloncesto\/competicion\/([^"]+)"/);
+    const compSlug = compMatch ? compMatch[1] : '';
+
+    if (!INCLUDE_BASKETBALL_COMPETITIONS.has(compSlug)) continue;
+
+    const competition = BASKETBALL_COMPETITION_CONFIG[compSlug].name;
+
+    // Extract home team
+    const localMatch = inner.match(/<td\s+class="local">([\s\S]*?)<\/td>/);
+    const homeTeam = extractTeam(localMatch?.[1] || '');
+
+    // Extract away team
+    const visitanteMatch = inner.match(/<td\s+class="visitante">([\s\S]*?)<\/td>/);
+    const awayTeam = extractTeam(visitanteMatch?.[1] || '');
+
+    // Extract channels
+    const canalesMatch = inner.match(/<ul\s+class="listaCanales">([\s\S]*?)<\/ul>/);
+    const channels: string[] = [];
+    if (canalesMatch) {
+      const liRe = /<li[^>]*title="([^"]*)"[^>]*>/g;
+      let liMatch;
+      while ((liMatch = liRe.exec(canalesMatch[1])) !== null) {
+        const rawName = decodeEntities(liMatch[1]);
+        if (rawName && !EXCLUDE_CHANNELS.has(rawName.toLowerCase())) {
+          channels.push(rawName);
+        }
+      }
+    }
+
+    if (homeTeam.name && awayTeam.name) {
+      events.push({ time, sport: Sport.BASKETBALL, competition, compSlug, homeTeam, awayTeam, channels });
+    }
+  }
+
+  return events;
+}
+
+function extractPlayer(html: string) {
+  const nameMatch = html.match(/<span\s+title="([^"]+)"/);
+  const imgMatch = html.match(/<img\s+src="([^"]+)"/);
+  return {
+    name: nameMatch ? decodeEntities(nameMatch[1]) : '',
+    badge: imgMatch ? imgMatch[1] : '',
+  };
+}
+
 function extractTeam(html: string) {
   const nameMatch = html.match(/<span\s+title="([^"]+)"/);
   const imgMatch = html.match(/<img\s+src="([^"]+)"/);
@@ -360,6 +553,97 @@ async function fetchEspnTeams(leagueCodes: string[]) {
   return teamMap;
 }
 
+// --- ESPN tennis player headshot lookup ---
+
+async function fetchEspnTennisPlayers() {
+  const playerMap = new Map<string, string>(); // normalized name → headshot URL
+
+  for (const league of ['atp', 'wta']) {
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/tennis/${league}/rankings`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const rankings = data.rankings?.[0]?.ranks || [];
+      for (const rank of rankings) {
+        const athlete = rank.athlete;
+        if (!athlete?.displayName || !athlete?.headshot) continue;
+        const headshot = athlete.headshot;
+        const name = normalizeTeamName(athlete.displayName);
+        playerMap.set(name, headshot);
+        // Also index by shortName (e.g. "A. Sabalenka")
+        if (athlete.shortName) {
+          playerMap.set(normalizeTeamName(athlete.shortName), headshot);
+        }
+      }
+    } catch (err: unknown) {
+      console.warn(`Failed to fetch ESPN ${league} rankings: ${(err as Error).message}`);
+    }
+  }
+
+  return playerMap;
+}
+
+async function fetchBasketballTeams(espnLeagueCodes: string[]) {
+  const teamMap = new Map<string, EspnEntry>();
+
+  // EuroLeague/incrowdsports API — covers Liga Endesa, EuroLeague, BCL, and 190+ European clubs
+  try {
+    const res = await fetch('https://api-live.euroleague.net/v2/clubs');
+    if (res.ok) {
+      const data = await res.json();
+      const clubs = (data.data || []) as { name: string; alias: string; isVirtual: boolean; images: { crest?: string } }[];
+      for (const club of clubs) {
+        if (club.isVirtual || !club.images?.crest || club.name.startsWith('U18')) continue;
+        for (const name of [club.name, club.alias]) {
+          if (name) teamMap.set(normalizeTeamName(name), { logo: club.images.crest });
+        }
+      }
+    }
+  } catch (err: unknown) {
+    console.warn(`Failed to fetch EuroLeague clubs: ${(err as Error).message}`);
+  }
+
+  // ESPN NBA/WNBA — complements EuroLeague data for American teams
+  for (const code of espnLeagueCodes) {
+    try {
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/${code}/teams`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const teams = data.sports?.[0]?.leagues?.[0]?.teams || [];
+      for (const { team } of teams) {
+        const logo = team.logos?.[0]?.href;
+        if (!logo) continue;
+        for (const name of [team.displayName, team.shortDisplayName, team.name]) {
+          if (name) teamMap.set(normalizeTeamName(name), { logo });
+        }
+      }
+    } catch (err: unknown) {
+      console.warn(`Failed to fetch ESPN basketball teams for ${code}: ${(err as Error).message}`);
+    }
+  }
+
+  return teamMap;
+}
+
+function findEspnPlayer(playerName: string, espnPlayers: Map<string, string>) {
+  const normalized = normalizeTeamName(playerName);
+
+  // Exact match
+  if (espnPlayers.has(normalized)) return espnPlayers.get(normalized);
+
+  // Extract last name(s) for fuzzy matching (e.g. "A. Sabalenka" → "sabalenka")
+  // Handles abbreviated first names like "A.", "D.", "J." from futbolenlatv
+  const lastName = normalized.replace(/^[a-z]\.\s*/, '').trim();
+
+  for (const [espnName, headshot] of espnPlayers) {
+    if (espnName.endsWith(lastName) || normalized.includes(espnName) || espnName.includes(normalized)) {
+      return headshot;
+    }
+  }
+
+  return null;
+}
+
 function findEspnTeam(teamName: string, espnTeams: Map<string, EspnEntry>) {
   const normalized = TEAM_ALIASES[normalizeTeamName(teamName)] ?? normalizeTeamName(teamName);
 
@@ -386,7 +670,7 @@ function classifyAcestreams(acestreams: ScrapedChannel[]) {
   for (const stream of acestreams) {
     if (!stream.name) continue;
     // Filter out non-Spanish streams (e.g. DAZN [DE], [IT])
-    if (/\[(DE|IT|FR|UK|PT)\]/i.test(stream.name)) continue;
+    if (/\[(DE|IT|FR|PT)\]/i.test(stream.name)) continue;
 
     for (const [regex, standard] of ACESTREAM_PATTERNS) {
       if (regex.test(stream.name)) {
@@ -418,11 +702,11 @@ function classifyAcestreams(acestreams: ScrapedChannel[]) {
 }
 
 // Deduplicate channels that resolve to the same standard name.
-// Keeps the first (non-HDR) variant as the display name.
+// Supports both futbolenlatv (BROADCAST_MAP) and wheresthematch (WTM_BROADCAST_MAP) channel names.
 function deduplicateChannels(channels: string[], classifiedStreams: Map<Channel, Stream[]>) {
   const seen = new Map();
   for (const ch of channels) {
-    const standard = BROADCAST_MAP[ch.toLowerCase()];
+    const standard = BROADCAST_MAP[ch.toLowerCase()] ?? WTM_BROADCAST_MAP[ch];
     if (!standard) {
       console.warn(`Unknown broadcast channel: "${ch}"`);
       continue;
@@ -436,27 +720,146 @@ function deduplicateChannels(channels: string[], classifiedStreams: Map<Channel,
   return [...seen.values()];
 }
 
+// --- Event merging ---
+
+// Additional aliases for merging team names across sources
+const MERGE_ALIASES: Record<string, string> = {
+  ...TEAM_ALIASES,
+  'manchester utd.': 'manchester united',
+  'manchester utd': 'manchester united',
+  'tottenham': 'tottenham hotspur',
+  'tottenham hotspur': 'tottenham hotspur',
+  'leeds utd': 'leeds united',
+  'leeds utd.': 'leeds united',
+  'newcastle utd': 'newcastle united',
+  'newcastle utd.': 'newcastle united',
+  'sheffield utd': 'sheffield united',
+  'sheffield utd.': 'sheffield united',
+  'west ham': 'west ham united',
+  'wolverhampton': 'wolverhampton wanderers',
+  'wolves': 'wolverhampton wanderers',
+  'brighton': 'brighton and hove albion',
+  'nott. forest': 'nottingham forest',
+  'inter milan': 'inter',
+  'inter de milan': 'inter',
+  'internazionale': 'inter',
+  'hellas verona': 'verona',
+  'como 1907': 'como',
+  'as roma': 'roma',
+  'ac milan': 'milan',
+  'pisa sporting club': 'pisa',
+  'pisa sc': 'pisa',
+  'celta': 'celta vigo',
+  'celta de vigo': 'celta vigo',
+  'at. madrid': 'atletico madrid',
+  'atletico de madrid': 'atletico madrid',
+  'ath. bilbao': 'athletic bilbao',
+  'deportivo la coruna': 'deportivo',
+  'deportivo la coruna women': 'deportivo women',
+  'sevilla fc': 'sevilla',
+  'real sociedad b': 'real sociedad ii',
+  'granada cf': 'granada',
+  'rb leipzig': 'leipzig',
+  'mainz 05': 'mainz',
+  '1. fc union berlin': 'union berlin',
+  'fc barcelona': 'barcelona',
+  'werder bremen': 'bremen',
+};
+
+function normalizeForMerge(name: string): string {
+  let n = name
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\b(CF|FC|CD|UD|RCD|SD|RC|CA|SC|SS|SE|AD)\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+  return MERGE_ALIASES[n] ?? n;
+}
+
+function eventKey(ev: RawEvent): string {
+  return `${ev.competition}|${normalizeForMerge(ev.homeTeam.name)}|${normalizeForMerge(ev.awayTeam.name)}`;
+}
+
+// Fuzzy match: check if two normalized team names refer to the same team
+function teamsMatch(a: string, b: string): boolean {
+  if (a === b) return true;
+  // Substring match (e.g., "verona" matches "hellas verona")
+  if (a.includes(b) || b.includes(a)) return true;
+  return false;
+}
+
+function mergeEvents(primary: RawEvent[], secondary: RawEvent[]): RawEvent[] {
+  const map = new Map<string, RawEvent>();
+  for (const ev of primary) {
+    map.set(eventKey(ev), ev);
+  }
+  for (const ev of secondary) {
+    const key = eventKey(ev);
+    let existing = map.get(key);
+
+    // If exact key match failed, try fuzzy matching within same competition
+    if (!existing) {
+      const secHome = normalizeForMerge(ev.homeTeam.name);
+      const secAway = normalizeForMerge(ev.awayTeam.name);
+      for (const [, candidate] of map) {
+        if (candidate.competition !== ev.competition) continue;
+        const candHome = normalizeForMerge(candidate.homeTeam.name);
+        const candAway = normalizeForMerge(candidate.awayTeam.name);
+        if (teamsMatch(candHome, secHome) && teamsMatch(candAway, secAway)) {
+          existing = candidate;
+          break;
+        }
+      }
+    }
+
+    if (existing) {
+      // Merge channels from secondary source into existing event
+      const existingSet = new Set(existing.channels.map(c => c.toLowerCase()));
+      for (const ch of ev.channels) {
+        if (!existingSet.has(ch.toLowerCase())) {
+          existing.channels.push(ch);
+        }
+      }
+    } else {
+      map.set(key, ev);
+    }
+  }
+  return [...map.values()];
+}
+
 
 function buildEvents(
   rawEvents: RawEvent[],
   espnTeams: Map<string, EspnEntry>,
+  espnPlayers: Map<string, string>,
+  basketballTeams: Map<string, EspnEntry>,
   classifiedStreams: Map<Channel, Stream[]>,
 ) {
   return rawEvents.map(ev => {
-    const homeEspn = findEspnTeam(ev.homeTeam.name, espnTeams);
-    const awayEspn = findEspnTeam(ev.awayTeam.name, espnTeams);
+    let homeBadge: string;
+    let awayBadge: string;
+
+    if (ev.sport === Sport.TENNIS) {
+      homeBadge = findEspnPlayer(ev.homeTeam.name, espnPlayers) || '';
+      awayBadge = findEspnPlayer(ev.awayTeam.name, espnPlayers) || '';
+    } else if (ev.sport === Sport.BASKETBALL) {
+      const homeEspn = findEspnTeam(ev.homeTeam.name, basketballTeams);
+      const awayEspn = findEspnTeam(ev.awayTeam.name, basketballTeams);
+      homeBadge = homeEspn?.logo || ev.homeTeam.badge;
+      awayBadge = awayEspn?.logo || ev.awayTeam.badge;
+    } else {
+      const homeEspn = findEspnTeam(ev.homeTeam.name, espnTeams);
+      const awayEspn = findEspnTeam(ev.awayTeam.name, espnTeams);
+      homeBadge = homeEspn?.logo || ev.homeTeam.badge;
+      awayBadge = awayEspn?.logo || ev.awayTeam.badge;
+    }
+
     return {
       time: ev.time,
       sport: ev.sport,
       competition: ev.competition,
-      homeTeam: {
-        name: ev.homeTeam.name,
-        badge: homeEspn?.logo || ev.homeTeam.badge,
-      },
-      awayTeam: {
-        name: ev.awayTeam.name,
-        badge: awayEspn?.logo || ev.awayTeam.badge,
-      },
+      homeTeam: { name: ev.homeTeam.name, badge: homeBadge },
+      awayTeam: { name: ev.awayTeam.name, badge: awayBadge },
       channels: deduplicateChannels(ev.channels, classifiedStreams),
     };
   });
@@ -469,10 +872,19 @@ function getTomorrowDate() {
 }
 
 async function main() {
-  console.log('Fetching futbolenlatv.es...');
-  const [footballHtml, tennisHtml] = await Promise.all([
+  const todayDate = new Date().toISOString().split('T')[0];
+  const tomorrowDateObj = new Date();
+  tomorrowDateObj.setDate(tomorrowDateObj.getDate() + 1);
+  const tomorrowDate = tomorrowDateObj.toISOString().split('T')[0];
+
+  // Fetch both sources in parallel
+  console.log('Fetching futbolenlatv.es and wheresthematch.com...');
+  const [footballHtml, tennisHtml, basketballHtml, wtmToday, wtmTomorrow] = await Promise.all([
     fetchHTML('https://www.futbolenlatv.es/'),
     fetchHTML('https://www.futbolenlatv.es/deporte/tenis'),
+    fetchHTML('https://www.futbolenlatv.es/deporte/baloncesto'),
+    scrapeWheresthematch(todayDate, true),
+    scrapeWheresthematch(tomorrowDate, false),
   ]);
 
   console.log('Parsing football events...');
@@ -481,19 +893,50 @@ async function main() {
   console.log(`Found ${footballTodayRaw.length} football events for today, ${footballTomorrowRaw.length} for tomorrow`);
 
   console.log('Parsing tennis events...');
-  const tennisTodayRaw = parseEvents(tennisHtml, 'today', Sport.TENNIS);
-  const tennisTomorrowRaw = parseEvents(tennisHtml, 'tomorrow', Sport.TENNIS);
+  const tennisTodayRaw = parseTennisEvents(tennisHtml, 'today');
+  const tennisTomorrowRaw = parseTennisEvents(tennisHtml, 'tomorrow');
   console.log(`Found ${tennisTodayRaw.length} tennis events for today, ${tennisTomorrowRaw.length} for tomorrow`);
 
-  const todayRaw = [...footballTodayRaw, ...tennisTodayRaw];
-  const tomorrowRaw = [...footballTomorrowRaw, ...tennisTomorrowRaw];
+  console.log('Parsing basketball events...');
+  const basketballTodayRaw = parseBasketballEvents(basketballHtml, 'today');
+  const basketballTomorrowRaw = parseBasketballEvents(basketballHtml, 'tomorrow');
+  console.log(`Found ${basketballTodayRaw.length} basketball events for today, ${basketballTomorrowRaw.length} for tomorrow`);
 
-  // Fetch ESPN badges for football competitions across both days
-  const allRaw = [...footballTodayRaw, ...footballTomorrowRaw];
-  const espnCodes = [...new Set(allRaw.map(ev => COMPETITION_CONFIG[ev.compSlug]?.espn).filter((c): c is string => Boolean(c)))];
+  // Merge futbolenlatv (primary) with wheresthematch (secondary)
+  const ftlvToday = [...footballTodayRaw, ...tennisTodayRaw, ...basketballTodayRaw];
+  const ftlvTomorrow = [...footballTomorrowRaw, ...tennisTomorrowRaw, ...basketballTomorrowRaw];
+
+  const todayRaw = mergeEvents(ftlvToday, wtmToday);
+  const tomorrowRaw = mergeEvents(ftlvTomorrow, wtmTomorrow);
+  console.log(`After merge: ${todayRaw.length} events today, ${tomorrowRaw.length} events tomorrow`);
+
+  // Fetch ESPN data for badges/headshots (using merged events to capture both sources)
+  const allMerged = [...todayRaw, ...tomorrowRaw];
+  const footballEvents = allMerged.filter(ev => ev.sport === Sport.FOOTBALL);
+  const espnCodes = [...new Set(footballEvents.map(ev => {
+    // Try compSlug first (futbolenlatv), then Competition→ESPN map (any source)
+    return COMPETITION_CONFIG[ev.compSlug]?.espn ?? COMPETITION_ESPN_CODES[ev.competition as Competition];
+  }).filter((c): c is string => Boolean(c)))];
   console.log(`Fetching ESPN badges for: ${espnCodes.join(', ') || 'none'}...`);
-  const espnTeams = await fetchEspnTeams(espnCodes);
+
+  const hasTennis = allMerged.some(ev => ev.sport === Sport.TENNIS);
+  if (hasTennis) console.log('Fetching ESPN tennis player headshots...');
+
+  const hasBasketball = allMerged.some(ev => ev.sport === Sport.BASKETBALL);
+  const basketballEvents = allMerged.filter(ev => ev.sport === Sport.BASKETBALL);
+  const espnBasketballCodes = [...new Set(basketballEvents.map(ev => {
+    return BASKETBALL_COMPETITION_CONFIG[ev.compSlug]?.espn ?? COMPETITION_ESPN_CODES[ev.competition as Competition];
+  }).filter((c): c is string => Boolean(c)))];
+  if (hasBasketball) console.log('Fetching basketball team badges (EuroLeague + ESPN)...');
+
+  const [espnTeams, espnPlayers, basketballTeams] = await Promise.all([
+    fetchEspnTeams(espnCodes),
+    hasTennis ? fetchEspnTennisPlayers() : Promise.resolve(new Map<string, string>()),
+    hasBasketball ? fetchBasketballTeams(espnBasketballCodes) : Promise.resolve(new Map<string, EspnEntry>()),
+  ]);
   console.log(`Got ${espnTeams.size} ESPN team entries`);
+  if (hasTennis) console.log(`Got ${espnPlayers.size} ESPN tennis player entries`);
+  if (hasBasketball) console.log(`Got ${basketballTeams.size} basketball team entries`);
 
   console.log('Loading acestream channels...');
   const acestreams = loadAcestreams();
@@ -506,7 +949,7 @@ async function main() {
   mkdirSync(dirname(OUT_PATH), { recursive: true });
 
   // Today
-  const todayEvents = buildEvents(todayRaw, espnTeams, classifiedStreams);
+  const todayEvents = buildEvents(todayRaw, espnTeams, espnPlayers, basketballTeams, classifiedStreams);
   const todayOutput = agendaSchema.parse({
     generatedAt: now,
     date: new Date().toISOString().split('T')[0],
@@ -516,7 +959,7 @@ async function main() {
   console.log(`Written ${todayEvents.length} events to ${OUT_PATH}`);
 
   // Tomorrow
-  const tomorrowEvents = buildEvents(tomorrowRaw, espnTeams, classifiedStreams);
+  const tomorrowEvents = buildEvents(tomorrowRaw, espnTeams, espnPlayers, basketballTeams, classifiedStreams);
   const tomorrowOutput = agendaSchema.parse({
     generatedAt: now,
     date: getTomorrowDate(),

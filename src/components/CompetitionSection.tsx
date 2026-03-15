@@ -1,4 +1,4 @@
-import { COMPETITION_ICONS, COMPETITION_COLORS, Competition, type ChannelEntry, type Event } from '@/lib/channels';
+import { COMPETITION_ICONS, COMPETITION_COLORS, COMPETITION_ICON_SIZE, Competition, type ChannelEntry, type Event } from '@/lib/channels';
 import { EventRow } from '@/components/EventRow';
 
 const CORNER_POSITIONS = {
@@ -36,7 +36,27 @@ interface CompetitionSectionProps {
 
 export function CompetitionSection({ name, events, onChannelSelect }: CompetitionSectionProps) {
   const competition = name as Competition;
-  const keepOriginalColors = competition === Competition.SERIE_A;
+  const keepOriginalColors = new Set<Competition>([
+    Competition.SERIE_A,
+    Competition.ROLAND_GARROS,
+    Competition.WIMBLEDON,
+    Competition.ATP_MASTERS_1000,
+    Competition.ATP_500,
+    Competition.ATP_250,
+    Competition.ATP_FINALS,
+    Competition.WTA_1000,
+    Competition.WTA_500,
+    Competition.WTA_250,
+    Competition.LAVER_CUP,
+    Competition.BJK_CUP,
+    Competition.LIGA_ENDESA,
+    Competition.EUROLEAGUE,
+    Competition.NBA,
+    Competition.BASKETBALL_CHAMPIONS_LEAGUE,
+    Competition.PRIMERA_FEB,
+    Competition.LIGA_FEMENINA_BALONCESTO,
+    Competition.FIBA_EUROPE_CUP,
+  ]).has(competition);
 
   return (
     <div className="relative">
@@ -46,7 +66,7 @@ export function CompetitionSection({ name, events, onChannelSelect }: Competitio
       <Corner position="tr" />
       <Corner position="bl" />
       <Corner position="br" />
-      <h2 className="relative flex items-center py-2 justify-center overflow-hidden">
+      <h2 className="relative flex items-center h-[4.5rem] justify-center overflow-hidden">
         {COMPETITION_COLORS[competition] && (
           <div
             className="absolute inset-0 pointer-events-none"
@@ -59,7 +79,7 @@ export function CompetitionSection({ name, events, onChannelSelect }: Competitio
           <img
             src={COMPETITION_ICONS[competition]}
             alt=""
-            className={`relative size-12 shrink-0 object-contain ${keepOriginalColors ? '' : 'brightness-0 dark:invert'}`}
+            className={`relative ${COMPETITION_ICON_SIZE[competition] ?? 'size-12'} shrink-0 object-contain ${keepOriginalColors ? '' : 'brightness-0 dark:invert'}`}
           />
         )}
       </h2>
