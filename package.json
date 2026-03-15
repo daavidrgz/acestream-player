@@ -8,7 +8,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "scrape": "tsx scripts/scrape-channels/index.ts",
-    "agenda": "tsx scripts/generate-agenda/index.ts"
+    "agenda": "tsx scripts/generate-agenda/index.ts",
+    "scrape-all": "pnpm run scrape && pnpm run agenda"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
