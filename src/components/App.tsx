@@ -6,6 +6,8 @@ import { SportSwitcher } from '@/components/SportSwitcher';
 import { SearchBar } from '@/components/SearchBar';
 import { StreamDialog } from '@/components/StreamDialog';
 import { PlayerDialog } from '@/components/PlayerDialog';
+import { LocalAcestreamBadge } from '@/components/LocalAcestreamBadge';
+import { useLocalAcestream } from '@/lib/useLocalAcestream';
 
 const IS_SERVER = typeof window === 'undefined';
 
@@ -48,6 +50,7 @@ export default function App({ today, tomorrow }: Props) {
   const [search, setSearch] = useState('');
   const [selectedChannel, setSelectedChannel] = useState<ChannelEntry | null>(null);
   const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
+  const acestream = useLocalAcestream();
 
   const agenda = agendas[day];
 
@@ -158,7 +161,10 @@ export default function App({ today, tomorrow }: Props) {
         showBack={!!selectedChannel}
         onBack={() => setSelectedStream(null)}
         onClose={closeModals}
+        acestream={acestream}
       />
+
+      <LocalAcestreamBadge status={acestream.status} onClick={acestream.check} />
     </div>
   );
 }
