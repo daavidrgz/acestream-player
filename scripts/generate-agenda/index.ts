@@ -4,7 +4,7 @@ import { writeFileSync, readFileSync, mkdirSync } from 'fs';
 import he from 'he';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { Channel, Competition, agendaSchema, type Stream } from '../../src/lib/channels';
+import { Channel, Competition, Sport, agendaSchema, type Stream } from '../../src/lib/channels';
 import type { ScrapedChannel } from '../scrape-channels/types';
 import type { RawEvent, EspnEntry } from './types';
 
@@ -56,6 +56,13 @@ const BROADCAST_MAP: Record<string, Channel> = {
   // Hypermotion
   'laliga tv hypermotion (m56 o120): ver partido': Channel.HYPERMOTION,
   'laliga tv hypermotion 2 (m59 o121): ver partido': Channel.HYPERMOTION_2,
+  // Tennis-specific broadcast names
+  'm+ #vamos bar (304)': Channel.VAMOS_BAR,
+  'm+ deportes 2 (64)': Channel.M_DEPORTES_2,
+  'movistar+': Channel.MOVISTAR_PLUS,
+  'm+ deportes (m63)': Channel.M_DEPORTES,
+  'm+ deportes 2 (m64)': Channel.M_DEPORTES_2,
+  'm+ deportes 3 (m198)': Channel.M_DEPORTES_3,
 };
 
 // Maps acestream channel names → canonical channel name.
@@ -87,11 +94,14 @@ const ACESTREAM_PATTERNS: [RegExp, Channel][] = [
   [/\bLiga de Campeones\b/i, Channel.M_LIGA_DE_CAMPEONES],
   [/\bM[.+]\s*Liga de Campeones\b/i, Channel.M_LIGA_DE_CAMPEONES],
   [/\bChampions\b/i, Channel.M_LIGA_DE_CAMPEONES],
+  [/\bM[.+]\s*Deportes\s+3\b/i, Channel.M_DEPORTES_3],
+  [/\bMovistar\s*Deportes\s+3\b/i, Channel.M_DEPORTES_3],
   [/\bM[.+]\s*Deportes\s+2\b/i, Channel.M_DEPORTES_2],
   [/\bMovistar\s*Deportes\s+2\b/i, Channel.M_DEPORTES_2],
   [/\bM[.+]\s*Deportes\b/i, Channel.M_DEPORTES],
   [/\bMovistar\s*Deportes\b/i, Channel.M_DEPORTES],
   [/\bMovistar\s*Plus\b/i, Channel.MOVISTAR_PLUS],
+  [/\bVamos\s*Bar\b/i, Channel.VAMOS_BAR],
   [/\bVamos\b/i, Channel.VAMOS],
   [/\bGol\s*Play\b/i, Channel.GOL_PLAY],
   [/\bGol\b/i, Channel.GOL_PLAY],
@@ -123,6 +133,11 @@ const EXCLUDE_CHANNELS = new Set([
   'laliga+ plus',
   'dazn app gratis (ver gratis)',
   'dazn (ver en directo)',
+  // Streaming-only / non-TV channels
+  'wta tv', 'atp tennis tv', 'rtve play',
+  'hbo max', 'movistar+ lite',
+  'tennis channel - orange tv (131)',
+  'canal por confirmar',
 ]);
 
 // Competition config: maps futbolenlatv slug → canonical name + ESPN league code.
@@ -143,7 +158,74 @@ const COMPETITION_CONFIG: Record<string, { name: Competition; espn?: string }> =
   'liga-f': { name: Competition.LIGA_F },
 };
 
+// Tennis competition config: maps futbolenlatv tennis slug → canonical name.
+const TENNIS_COMPETITION_CONFIG: Record<string, { name: Competition }> = {
+  // Grand Slams
+  'roland-garros': { name: Competition.ROLAND_GARROS },
+  'roland-garros-wta': { name: Competition.ROLAND_GARROS },
+  'wimbledon': { name: Competition.WIMBLEDON },
+  // ATP Masters 1000
+  'masters-indian-wells': { name: Competition.ATP_MASTERS_1000 },
+  'masters-miami': { name: Competition.ATP_MASTERS_1000 },
+  'masters-montecarlo': { name: Competition.ATP_MASTERS_1000 },
+  'masters-madrid': { name: Competition.ATP_MASTERS_1000 },
+  'masters-roma': { name: Competition.ATP_MASTERS_1000 },
+  'masters-canada': { name: Competition.ATP_MASTERS_1000 },
+  'masters-cincinnati': { name: Competition.ATP_MASTERS_1000 },
+  'masters-shangai': { name: Competition.ATP_MASTERS_1000 },
+  'masters-paris': { name: Competition.ATP_MASTERS_1000 },
+  // ATP 500
+  'barcelona-open': { name: Competition.ATP_500 },
+  'torneo-de-queens': { name: Competition.ATP_500 },
+  'torneo-de-halle': { name: Competition.ATP_500 },
+  'torneo-de-hamburgo': { name: Competition.ATP_500 },
+  'citi-open-washington': { name: Competition.ATP_500 },
+  'torneo-de-bastad': { name: Competition.ATP_500 },
+  // ATP 250
+  'torneo-de-munich': { name: Competition.ATP_250 },
+  'torneo-estoril': { name: Competition.ATP_250 },
+  'geneva-open': { name: Competition.ATP_250 },
+  'torneo-de-eastbourne': { name: Competition.ATP_250 },
+  'mallorca-championships': { name: Competition.ATP_250 },
+  'torneo-hertogenbosch': { name: Competition.ATP_250 },
+  'atp-250-gstaad': { name: Competition.ATP_250 },
+  'open-umag': { name: Competition.ATP_250 },
+  'torneo-de-kitzbuhel': { name: Competition.ATP_250 },
+  'torneo-los-cabos': { name: Competition.ATP_250 },
+  'atp-250-houston': { name: Competition.ATP_250 },
+  'torneo-de-bucarest': { name: Competition.ATP_250 },
+  'torneo-de-marrakech': { name: Competition.ATP_250 },
+  'torneo-murcia': { name: Competition.ATP_250 },
+  'stuttgart-atp': { name: Competition.ATP_250 },
+  // ATP Finals
+  'copa-masters-tenis': { name: Competition.ATP_FINALS },
+  // WTA 1000
+  'wta-indian-wells': { name: Competition.WTA_1000 },
+  'wta-miami': { name: Competition.WTA_1000 },
+  'wta-madrid-open': { name: Competition.WTA_1000 },
+  'wta-roma': { name: Competition.WTA_1000 },
+  // WTA 500
+  'torneo-de-charleston': { name: Competition.WTA_500 },
+  'wta-torneo-de-stuttgart': { name: Competition.WTA_500 },
+  'wta-german-open': { name: Competition.WTA_500 },
+  'wta-londres': { name: Competition.WTA_500 },
+  'wta-torneo-de-eastbourne': { name: Competition.WTA_500 },
+  // WTA 250
+  'wta-torneo-bogota': { name: Competition.WTA_250 },
+  'wta-torneo-rouen': { name: Competition.WTA_250 },
+  'wta-torneo-rabat': { name: Competition.WTA_250 },
+  'wta-estrasburgo': { name: Competition.WTA_250 },
+  'wta-nottingham-open': { name: Competition.WTA_250 },
+  'wta-bad-homburg-open': { name: Competition.WTA_250 },
+  'wta-torneo-hertogenbosch': { name: Competition.WTA_250 },
+  'torneo-de-linz': { name: Competition.WTA_250 },
+  // Other
+  'laver-cup': { name: Competition.LAVER_CUP },
+  'fed-cup-finals': { name: Competition.BJK_CUP },
+};
+
 const INCLUDE_COMPETITIONS = new Set(Object.keys(COMPETITION_CONFIG));
+const INCLUDE_TENNIS_COMPETITIONS = new Set(Object.keys(TENNIS_COMPETITION_CONFIG));
 
 // Decode HTML entities (&#225; → á, &#233; → é, etc.)
 function decodeEntities(str: string) {
@@ -156,8 +238,10 @@ async function fetchHTML(url: string) {
   return res.text();
 }
 
-function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
+function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today', sport: Sport = Sport.FOOTBALL) {
   const events: RawEvent[] = [];
+  const includeSet = sport === Sport.TENNIS ? INCLUDE_TENNIS_COMPETITIONS : INCLUDE_COMPETITIONS;
+  const configMap = sport === Sport.TENNIS ? TENNIS_COMPETITION_CONFIG : COMPETITION_CONFIG;
 
   // Find all table rows
   const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
@@ -187,10 +271,10 @@ function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
     const compUrlMatch = inner.match(/<meta\s+itemprop="url"\s+content="[^"]*\/competicion\/([^"]+)"/);
     const compSlug = compUrlMatch ? compUrlMatch[1] : '';
 
-    if (INCLUDE_COMPETITIONS && !INCLUDE_COMPETITIONS.has(compSlug)) continue;
+    if (!includeSet.has(compSlug)) continue;
 
     // Pretty competition name from slug
-    const competition = COMPETITION_CONFIG[compSlug].name;
+    const competition = configMap[compSlug].name;
 
     // Extract home team
     const localMatch = inner.match(/<td\s+class="local">([\s\S]*?)<\/td>/);
@@ -215,7 +299,7 @@ function parseEvents(html: string, day: 'today' | 'tomorrow' = 'today') {
     }
 
     if (homeTeam.name && awayTeam.name) {
-      events.push({ time, competition, compSlug, homeTeam, awayTeam, channels });
+      events.push({ time, sport, competition, compSlug, homeTeam, awayTeam, channels });
     }
   }
 
@@ -361,6 +445,7 @@ function buildEvents(
     const awayEspn = findEspnTeam(ev.awayTeam.name, espnTeams);
     return {
       time: ev.time,
+      sport: ev.sport,
       competition: ev.competition,
       homeTeam: {
         name: ev.homeTeam.name,
@@ -383,15 +468,26 @@ function getTomorrowDate() {
 
 async function main() {
   console.log('Fetching futbolenlatv.es...');
-  const html = await fetchHTML('https://www.futbolenlatv.es/');
+  const [footballHtml, tennisHtml] = await Promise.all([
+    fetchHTML('https://www.futbolenlatv.es/'),
+    fetchHTML('https://www.futbolenlatv.es/deporte/tenis'),
+  ]);
 
-  console.log('Parsing events...');
-  const todayRaw = parseEvents(html, 'today');
-  const tomorrowRaw = parseEvents(html, 'tomorrow');
-  console.log(`Found ${todayRaw.length} events for today, ${tomorrowRaw.length} for tomorrow`);
+  console.log('Parsing football events...');
+  const footballTodayRaw = parseEvents(footballHtml, 'today', Sport.FOOTBALL);
+  const footballTomorrowRaw = parseEvents(footballHtml, 'tomorrow', Sport.FOOTBALL);
+  console.log(`Found ${footballTodayRaw.length} football events for today, ${footballTomorrowRaw.length} for tomorrow`);
 
-  // Fetch ESPN badges for all competitions across both days
-  const allRaw = [...todayRaw, ...tomorrowRaw];
+  console.log('Parsing tennis events...');
+  const tennisTodayRaw = parseEvents(tennisHtml, 'today', Sport.TENNIS);
+  const tennisTomorrowRaw = parseEvents(tennisHtml, 'tomorrow', Sport.TENNIS);
+  console.log(`Found ${tennisTodayRaw.length} tennis events for today, ${tennisTomorrowRaw.length} for tomorrow`);
+
+  const todayRaw = [...footballTodayRaw, ...tennisTodayRaw];
+  const tomorrowRaw = [...footballTomorrowRaw, ...tennisTomorrowRaw];
+
+  // Fetch ESPN badges for football competitions across both days
+  const allRaw = [...footballTodayRaw, ...footballTomorrowRaw];
   const espnCodes = [...new Set(allRaw.map(ev => COMPETITION_CONFIG[ev.compSlug]?.espn).filter((c): c is string => Boolean(c)))];
   console.log(`Fetching ESPN badges for: ${espnCodes.join(', ') || 'none'}...`);
   const espnTeams = await fetchEspnTeams(espnCodes);
