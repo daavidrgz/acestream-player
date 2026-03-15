@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Copy, Check, ArrowLeft, Monitor } from 'lucide-react';
+import { Copy, Check, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Stream } from '@/lib/channels';
+import type { AcestreamStatus } from '@/lib/useLocalAcestream';
 import {
   Dialog,
   DialogContent,
@@ -20,21 +21,20 @@ const PLAYERS = [
   { name: 'nPlayer', icon: '/icons/nplayer.png', scheme: (url: string) => `nplayer-${url}` },
 ] as const;
 
-const LOCAL_ACESTREAM_PORT = 6878;
-
 export function PlayerDialog({
   stream,
   showBack,
   onBack,
   onClose,
+  acestream,
 }: {
   stream: Stream | null;
   showBack: boolean;
   onBack: () => void;
   onClose: () => void;
+  acestream: { status: AcestreamStatus; getStreamUrl: (id: string) => string };
 }) {
   const [copied, setCopied] = useState(false);
-  const [localAcestream, setLocalAcestream] = useState<'idle' | 'checking' | 'found' | 'not_found'>('idle');
 
   function handleCopy() {
     if (!stream) return;
@@ -73,64 +73,32 @@ export function PlayerDialog({
   }
 
   function handleLocalAcestream() {
-    if (!stream) return;
-    setLocalAcestream('checking');
-
-    // Probe the local Acestream engine HTTP API
-    fetch(`http://127.0.0.1:${LOCAL_ACESTREAM_PORT}/webui/api/service?method=get_version`, {
-      signal: AbortSignal.timeout(3000),
-    })
-      .then((res) => {
-        if (res.ok) {
-          setLocalAcestream('found');
-          // Open the stream in the local Acestream player via its HTTP playback URL
-          window.open(
-            `http://127.0.0.1:${LOCAL_ACESTREAM_PORT}/ace/getstream?id=${stream.id}`,
-            '_blank',
-          );
-        } else {
-          setLocalAcestream('not_found');
-          setTimeout(() => setLocalAcestream('idle'), 3000);
-        }
-      })
-      .catch(() => {
-        setLocalAcestream('not_found');
-        setTimeout(() => setLocalAcestream('idle'), 3000);
-      });
+    if (!stream || acestream.status !== 'connected') return;
+    window.open(acestream.getStreamUrl(stream.id), '_blank');
+    onClose();
   }
 
-  const localLabel =
-    localAcestream === 'checking'
-      ? 'Detecting...'
-      : localAcestream === 'found'
-        ? 'Local Acestream Detected!'
-        : localAcestream === 'not_found'
-          ? 'Engine not found'
-          : 'Local Acestream';
-
-  const localIcon =
-    localAcestream === 'found' ? (
-      <Check className="size-5 text-green-500" />
-    ) : (
-      <Monitor className="size-5" />
-    );
+  const isConnected = acestream.status === 'connected';
 
   const items = [
-    {
-      key: 'local-acestream',
-      label: localLabel,
-      icon: localIcon,
-      onClick: handleLocalAcestream,
-      sublabel: localAcestream === 'idle' ? 'Open with local engine' : localAcestream === 'not_found' ? 'Make sure Acestream is running' : undefined,
-      highlight: localAcestream === 'found',
-      error: localAcestream === 'not_found',
-    },
+    ...(isConnected
+      ? [
+          {
+            key: 'local-acestream',
+            label: 'Local Acestream',
+            icon: <img src="/icons/acestream.svg" alt="" className="size-5" />,
+            onClick: handleLocalAcestream,
+            sublabel: 'Open with local engine',
+            highlight: true,
+          },
+        ]
+      : []),
     { key: 'copy', label: copied ? 'Copied!' : 'Copy Link', icon: copied ? <Check className="size-5 text-green-500" /> : <Copy className="size-5" />, onClick: handleCopy },
     ...PLAYERS.map((p) => ({ key: p.name, label: p.name, icon: <img src={p.icon} alt="" className="size-5" />, onClick: () => openIn(p) })),
   ];
 
   return (
-    <Dialog open={!!stream} onOpenChange={(open) => { if (!open) { onClose(); setLocalAcestream('idle'); } }}>
+    <Dialog open={!!stream} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="p-0">
         <DialogHeader className="px-4 pt-4">
           <div className="flex items-center gap-2">
@@ -154,7 +122,6 @@ export function PlayerDialog({
                 'flex cursor-pointer items-center gap-3 px-4 py-3.5 text-sm transition-colors hover:bg-secondary/50',
                 i === items.length - 1 ? 'rounded-b-xl' : 'border-b border-border/50',
                 'highlight' in item && item.highlight && 'text-green-500',
-                'error' in item && item.error && 'text-red-400',
               )}
               onClick={item.onClick}
             >
