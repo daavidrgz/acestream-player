@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Copy, Check, ArrowLeft, Monitor, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Stream } from '@/lib/channels';
-import type { AcestreamStatus } from '@/lib/useLocalAcestream';
+import type { AcestreamStatus, LocalPlayer } from '@/lib/useLocalAcestream';
 import {
   Dialog,
   DialogContent,
@@ -69,7 +69,13 @@ export function PlayerDialog({
   showBack: boolean;
   onBack: () => void;
   onClose: () => void;
-  acestream: { status: AcestreamStatus; getStreamUrl: (id: string) => string };
+  acestream: {
+    status: AcestreamStatus;
+    players: LocalPlayer[];
+    getAcestreamUrl: (id: string) => string;
+    getHlsUrl: (id: string) => string;
+    openInPlayer: (playerId: string, streamId: string) => Promise<void>;
+  };
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -110,9 +116,31 @@ export function PlayerDialog({
     onClose();
   }
 
-  function handleLocalAcestream() {
-    if (!stream || acestream.status !== 'connected') return;
-    window.open(acestream.getStreamUrl(stream.id), '_blank');
+  function handleAcestreamProtocol() {
+    if (!stream) return;
+    window.location.href = acestream.getAcestreamUrl(stream.id);
+    onClose();
+  }
+
+  function handleHlsStream() {
+    if (!stream) return;
+    window.open(acestream.getHlsUrl(stream.id), '_blank');
+    onClose();
+  }
+
+  function handleVlcLocal() {
+    if (!stream) return;
+    window.location.href = `vlc://${acestream.getHlsUrl(stream.id)}`;
+    onClose();
+  }
+
+  async function handleOpenInPlayer(player: LocalPlayer) {
+    if (!stream) return;
+    try {
+      await acestream.openInPlayer(player.id, stream.id);
+    } catch {
+      // silently fail — user will see nothing happened
+    }
     onClose();
   }
 
@@ -143,25 +171,47 @@ export function PlayerDialog({
 
         <div className="overflow-y-auto overscroll-contain px-2 pb-2">
           {/* Local section */}
-          {isConnected && (
-            <>
-              <div className="flex items-center gap-2 px-3 pt-2 pb-1">
-                <Monitor className="size-3.5" />
-                <span className="text-sm font-semibold text-foreground">
-                  Local
-                </span>
-              </div>
-              <div className="flex flex-col gap-px">
+          <div className="flex items-center gap-2 px-3 pt-2 pb-1">
+            <Monitor className="size-3.5" />
+            <span className="text-sm font-semibold text-foreground">
+              Local
+            </span>
+          </div>
+          <div className="flex flex-col gap-px">
+            <PlayerRow
+              icon={<img src="/icons/acestream.svg" alt="" className="size-4" />}
+              label="Acestream"
+              sublabel="Open with acestream:// protocol"
+              onClick={handleAcestreamProtocol}
+            />
+            {isConnected && (
+              <>
+                {acestream.players.map((player) => (
+                  <PlayerRow
+                    key={player.id}
+                    icon={<img src="/icons/acestream.svg" alt="" className="size-4" />}
+                    label={player.name}
+                    sublabel="Detected local player"
+                    onClick={() => handleOpenInPlayer(player)}
+                  />
+                ))}
                 <PlayerRow
-                  icon={<img src="/icons/acestream.svg" alt="" className="size-4" />}
-                  label="Acestream Engine"
-                  sublabel="Open with local engine"
-                  onClick={handleLocalAcestream}
+                  icon={<img src="/icons/vlc.svg" alt="" className="size-4" />}
+                  label="VLC (local)"
+                  sublabel="Open HLS stream in VLC"
+                  onClick={handleVlcLocal}
                 />
-              </div>
-              <div className="mx-3 my-2 border-t border-border" />
-            </>
-          )}
+                <PlayerRow
+                  icon={<Monitor className="size-4" />}
+                  label="HLS Stream"
+                  sublabel="Open m3u8 manifest in browser"
+                  onClick={handleHlsStream}
+                />
+              </>
+            )}
+          </div>
+
+          <div className="mx-3 my-2 border-t border-border" />
 
           {/* Remote section */}
           <div className="flex items-center gap-2 px-3 pt-2 pb-1">
